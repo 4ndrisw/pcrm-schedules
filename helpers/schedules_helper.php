@@ -2,6 +2,10 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+hooks()->add_action('app_admin_head', 'schedules_head_component');
+//hooks()->add_action('app_admin_footer', 'schedules_footer_js__component');
+hooks()->add_action('admin_init', 'schedules_settings_tab');
+
 /**
  * Get Schedule short_url
  * @since  Version 2.7.3
@@ -85,7 +89,7 @@ function is_schedules_email_expiry_reminder_enabled()
  */
 function is_schedules_expiry_reminders_enabled()
 {
-    return is_schedules_email_expiry_reminder_enabled() || is_sms_trigger_active(SMS_TRIGGER_SCHEDULES_EXP_REMINDER);
+    return is_schedules_email_expiry_reminder_enabled() || is_sms_trigger_active(SMS_TRIGGER_SCHEDULE_EXP_REMINDER);
 }
 
 /**
@@ -319,11 +323,11 @@ function get_schedules_where_sql_for_staff($staff_id)
     if ($has_permission_view_own) {
         $whereUser = '((' . db_prefix() . 'schedules.addedfrom=' . $CI->db->escape_str($staff_id) . ' AND ' . db_prefix() . 'schedules.addedfrom IN (SELECT staff_id FROM ' . db_prefix() . 'staff_permissions WHERE feature = "schedules" AND capability="view_own"))';
         if ($allow_staff_view_schedules_assigned == 1) {
-            $whereUser .= ' OR sale_agent=' . $CI->db->escape_str($staff_id);
+            $whereUser .= ' OR assigned=' . $CI->db->escape_str($staff_id);
         }
         $whereUser .= ')';
     } else {
-        $whereUser .= 'sale_agent=' . $CI->db->escape_str($staff_id);
+        $whereUser .= 'assigned=' . $CI->db->escape_str($staff_id);
     }
 
     return $whereUser;
@@ -342,7 +346,7 @@ function staff_has_assigned_schedules($staff_id = '')
     if (is_numeric($cache)) {
         $result = $cache;
     } else {
-        $result = total_rows(db_prefix() . 'schedules', ['sale_agent' => $staff_id]);
+        $result = total_rows(db_prefix() . 'schedules', ['assigned' => $staff_id]);
         $CI->app_object_cache->add('staff-total-assigned-schedules-' . $staff_id, $result);
     }
 
@@ -364,13 +368,13 @@ function user_can_view_schedule($id, $staff_id = false)
         return true;
     }
 
-    $CI->db->select('id, addedfrom, sale_agent');
+    $CI->db->select('id, addedfrom, assigned');
     $CI->db->from(db_prefix() . 'schedules');
     $CI->db->where('id', $id);
     $schedule = $CI->db->get()->row();
 
     if ((has_permission('schedules', $staff_id, 'view_own') && $schedule->addedfrom == $staff_id)
-        || ($schedule->sale_agent == $staff_id && get_option('allow_staff_view_schedules_assigned') == '1')
+        || ($schedule->assigned == $staff_id && get_option('allow_staff_view_schedules_assigned') == '1')
     ) {
         return true;
     }
@@ -380,20 +384,187 @@ function user_can_view_schedule($id, $staff_id = false)
 
 
 /**
- * Get module version.
- *
+ * Prepare general schedule pdf
+ * @since  Version 1.0.2
+ * @param  object $schedule schedule as object with all necessary fields
+ * @param  string $tag tag for bulk pdf exporter
+ * @return mixed object
+ */
+function schedule_pdf($schedule, $tag = '')
+{
+    //module_libs_path(SCHEDULES_MODULE_NAME, 'libraries');
+    return app_pdf('schedule',  module_libs_path(SCHEDULES_MODULE_NAME) . 'pdf/Schedule_pdf', $schedule, $tag);
+    //return app_pdf('schedule',  LIBSPATH . 'pdf/Estimate_pdf', $schedule, $tag);
+}
+
+
+
+/**
+ * Get items table for preview
+ * @param  object  $transaction   e.q. invoice, estimate from database result row
+ * @param  string  $type          type, e.q. invoice, estimate, proposal
+ * @param  string  $for           where the items will be shown, html or pdf
+ * @param  boolean $admin_preview is the preview for admin area
+ * @return object
+ */
+function get_schedule_items_table_data($transaction, $type, $for = 'html', $admin_preview = false)
+{
+    include_once(module_libs_path(SCHEDULES_MODULE_NAME) . 'Schedule_items_table.php');
+
+    $class = new Schedule_items_table($transaction, $type, $for, $admin_preview);
+
+    $class = hooks()->apply_filters('items_table_class', $class, $transaction, $type, $for, $admin_preview);
+
+    if (!$class instanceof App_items_table_template) {
+        show_error(get_class($class) . ' must be instance of "Schedule_items_template"');
+    }
+
+    return $class;
+}
+
+
+
+/**
+ * Add new item do database, used for proposals,estimates,credit notes,invoices
+ * This is repetitive action, that's why this function exists
+ * @param array $item     item from $_POST
+ * @param mixed $rel_id   relation id eq. invoice id
+ * @param string $rel_type relation type eq invoice
+ */
+function add_new_schedule_item_post($item, $rel_id, $rel_type)
+{
+
+    $CI = &get_instance();
+
+    $CI->db->insert(db_prefix() . 'itemable', [
+                    'description'      => $item['description'],
+                    'long_description' => nl2br($item['long_description']),
+                    'qty'              => $item['qty'],
+                    //'rate'             => number_format($item['rate'], get_decimal_places(), '.', ''),
+                    'rel_id'           => $rel_id,
+                    'rel_type'         => $rel_type,
+                    'item_order'       => $item['order'],
+                    'unit'             => isset($item['unit']) ? $item['unit'] : 'unit',
+                ]);
+
+    $id = $CI->db->insert_id();
+
+    return $id;
+}
+
+/**
+ * Update schedule item from $_POST 
+ * @param  mixed $item_id item id to update
+ * @param  array $data    item $_POST data
+ * @param  string $field   field is require to be passed for long_description,rate,item_order to do some additional checkings
+ * @return boolean
+ */
+function update_schedule_item_post($item_id, $data, $field = '')
+{
+    $update = [];
+    if ($field !== '') {
+        if ($field == 'long_description') {
+            $update[$field] = nl2br($data[$field]);
+        } elseif ($field == 'rate') {
+            $update[$field] = number_format($data[$field], get_decimal_places(), '.', '');
+        } elseif ($field == 'item_order') {
+            $update[$field] = $data['order'];
+        } else {
+            $update[$field] = $data[$field];
+        }
+    } else {
+        $update = [
+            'item_order'       => $data['order'],
+            'description'      => $data['description'],
+            'long_description' => nl2br($data['long_description']),
+            'rate'             => number_format($data['rate'], get_decimal_places(), '.', ''),
+            'qty'              => $data['qty'],
+            'unit'             => $data['unit'],
+        ];
+    }
+
+    $CI = &get_instance();
+    $CI->db->where('id', $item_id);
+    $CI->db->update(db_prefix() . 'itemable', $update);
+
+    return $CI->db->affected_rows() > 0 ? true : false;
+}
+
+
+/**
+ * Prepares email template preview $data for the view
+ * @param  string $template    template class name
+ * @param  mixed $customer_id_or_email customer ID to fetch the primary contact email or email
+ * @return array
+ */
+function schedule_mail_preview_data($template, $customer_id_or_email, $mailClassParams = [])
+{
+    $CI = &get_instance();
+
+    if (is_numeric($customer_id_or_email)) {
+        $contact = $CI->clients_model->get_contact(get_primary_contact_user_id($customer_id_or_email));
+        $email   = $contact ? $contact->email : '';
+    } else {
+        $email = $customer_id_or_email;
+    }
+
+    $CI->load->model('emails_model');
+
+    $data['template'] = $CI->app_mail_template->prepare($email, $template);
+    $slug             = $CI->app_mail_template->get_default_property_value('slug', $template, $mailClassParams);
+
+    $data['template_name'] = $slug;
+
+    $template_result = $CI->emails_model->get(['slug' => $slug, 'language' => 'english'], 'row');
+
+    $data['template_system_name'] = $template_result->name;
+    $data['template_id']          = $template_result->emailtemplateid;
+
+    $data['template_disabled'] = $template_result->active == 0;
+
+    return $data;
+}
+
+
+/**
+ * Function that return full path for upload based on passed type
+ * @param  string $type
  * @return string
  */
-if (!function_exists('get_schedules_version')) {
+function get_schedule_upload_path($type=NULL)
+{
+   $type = 'schedule';
+   $path = SCHEDULE_ATTACHMENTS_FOLDER;
+   
+    return hooks()->apply_filters('get_upload_path_by_type', $path, $type);
+}
 
-    function get_schedules_version()
-    {
-        get_instance()->db->where('module_name', 'schedules');
-        $version = get_instance()->db->get(db_prefix() . 'modules');
 
-        if ($version->num_rows() > 0) {
-            return _l('schedules_current_version ') . $version->row('installed_version');
-        }
-        return 'Unknown';
+/**
+ * [perfex_dark_theme_settings_tab net menu item in setup->settings]
+ * @return void
+ */
+function schedules_settings_tab()
+{
+    $CI = &get_instance();
+    $CI->app_tabs->add_settings_tab('schedules', [
+        'name'     => _l('settings_group_schedules'),
+        //'view'     => module_views_path(SCHEDULES_MODULE_NAME, 'admin/settings/includes/schedules'),
+        'view'     => 'schedules/schedules_settings',
+        'position' => 50,
+    ]);
+}
+
+
+/**
+ * Injects theme CSS
+ * @return null
+ */
+function schedules_head_component()
+{
+    $CI = &get_instance();
+    if ($CI->uri->segment(1) == 'admin' && $CI->uri->segment(2) == 'schedules'){
+        echo '<link href="' . base_url('modules/schedules/assets/css/schedules.css') . '"  rel="stylesheet" type="text/css" >';
     }
 }
+
