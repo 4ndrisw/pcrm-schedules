@@ -2,6 +2,37 @@
 
 class MySchedule extends ClientsController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('schedules_model');
+        $this->load->model('clients_model');
+    }
+
+    /* Get all schedules in case user go on index page */
+    public function list($id = '')
+    {
+        
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data(module_views_path('schedules', 'admin/tables/table'));
+        }
+        $contact_id = get_contact_user_id();
+        $user_id = get_user_id_by_contact_id($contact_id);
+        $client = $this->clients_model->get($user_id);
+        
+        $data['schedules'] = $this->schedules_model->get_client_schedules($client);
+        $data['client'] = $client;
+        $data['schedule_statuses'] = $this->schedules_model->get_statuses();
+        $data['scheduleid']            = $id;
+        $data['title']                 = _l('schedules_tracking');
+        
+        $data['bodyclass'] = 'schedules';
+        $this->data($data);
+        $this->view('themes/'. active_clients_theme() .'/views/schedules/schedules');
+        $this->layout();
+
+    }
+
     public function show($id, $hash)
     {
         check_schedule_restrictions($id, $hash);
@@ -86,7 +117,7 @@ class MySchedule extends ClientsController
         $data['schedule_members']  = $this->schedules_model->get_schedule_members($schedule->id,true);
         $this->data($data);
         //$this->view('schedulehtml');
-        $this->view('themes/'. active_clients_theme() .'/views/schedulehtml');
+        $this->view('themes/'. active_clients_theme() .'/views/schedules/schedulehtml');
         add_views_tracking('schedule', $id);
         hooks()->do_action('schedule_html_viewed', $id);
         no_index_customers_area();

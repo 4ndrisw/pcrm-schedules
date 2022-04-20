@@ -1642,5 +1642,29 @@ class Schedules_model extends App_Model
     }
 
 
+    /**
+     * Get the schedules for the client given
+     *
+     * @param  integer|null $staffId
+     * @param  integer $days
+     *
+     * @return array
+     */
+    public function get_client_schedules($client = null)
+    {
+        /*
+        if ($staffId && ! staff_can('view', 'schedules', $staffId)) {
+            $this->db->where('addedfrom', $staffId);
+        }
+        */
+
+        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'schedules.hash,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
+        $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'schedules.clientid', 'left');
+        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
+        $this->db->where('expirydate IS NOT NULL');
+        $this->db->where(db_prefix() . 'schedules.clientid =', $client->userid);
+
+        return $this->db->get(db_prefix() . 'schedules')->result_array();
+    }
 
 }

@@ -17,6 +17,8 @@ hooks()->add_filter('before_schedule_added', '_format_data_schedule_feature');
 
 hooks()->add_action('after_cron_run', 'schedules_notification');
 hooks()->add_action('admin_init', 'schedules_module_init_menu_items');
+hooks()->add_action('clients_init', 'schedules_clients_area_menu_items');
+
 hooks()->add_action('staff_member_deleted', 'schedules_staff_member_deleted');
 hooks()->add_action('admin_init', 'schedules_permissions');
 
@@ -159,11 +161,24 @@ function schedules_module_init_menu_items()
             ]);
 
     if (has_permission('schedules', '', 'view')) {
-        $CI->app_menu->add_sidebar_children_item('utilities', [
+        $CI->app_menu->add_sidebar_menu_item('schedules', [
                 'slug'     => 'schedules-tracking',
                 'name'     => _l('schedules'),
+                'icon'     => 'fa fa-map-marker',
                 'href'     => admin_url('schedules'),
-                'position' => 24,
+                'position' => 12,
+        ]);
+    }
+}
+
+function schedules_clients_area_menu_items()
+{   
+    // Show menu item only if client is logged in
+    if (is_client_logged_in()) {
+        add_theme_menu_item('schedules', [
+                    'name'     => _l('schedules'),
+                    'href'     => site_url('schedules/list'),
+                    'position' => 15,
         ]);
     }
 }

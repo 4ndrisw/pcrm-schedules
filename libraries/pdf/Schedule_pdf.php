@@ -46,7 +46,7 @@ class Schedule_pdf extends App_pdf
     protected function file_path()
     {
         $customPath = APPPATH . 'views/themes/' . active_clients_theme() . '/views/my_schedulepdf.php';
-        $actualPath = module_views_path('schedules','themes/' . active_clients_theme() . '/views/schedulepdf.php');
+        $actualPath = module_views_path('schedules','themes/' . active_clients_theme() . '/views/schedules/schedulepdf.php');
 
         if (file_exists($customPath)) {
             $actualPath = $customPath;

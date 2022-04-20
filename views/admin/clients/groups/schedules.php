@@ -10,6 +10,6 @@
 	<div id="schedules_total"></div>
 	<?php
 	$this->load->view('admin/schedules/table_html', array('class'=>'schedules-single-client'));
-	$this->load->view('admin/clients/modals/zip_schedules');
+	//$this->load->view('admin/clients/modals/zip_schedules');
 	?>
 <?php } ?>

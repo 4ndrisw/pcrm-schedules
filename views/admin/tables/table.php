@@ -34,6 +34,7 @@ $where  = [];
 
 $additionalColumns = hooks()->apply_filters('schedules_table_additional_columns_sql', [
     'id',
+    'acceptance_lastname',
 ]);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $additionalColumns);
