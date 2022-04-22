@@ -59,8 +59,8 @@ foreach ($rResult as $aRow) {
             $_data .= '</div>';
         }elseif ($aColumns[$i] == 'project_id') {
             $_data = get_project_name_by_id($_data);
-        }
-        /*elseif ($aColumns[$i] == 'projects_name') {
+        }/*
+        elseif ($aColumns[$i] == 'name') {
             $_data = $_data;
         }*/
         elseif ($aColumns[$i] == 'status') {

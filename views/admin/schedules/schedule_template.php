@@ -168,7 +168,7 @@
                   <?php } else if($format == 4) { ?>
                    <span class="input-group-addon">
                      <span id="prefix_month" class="format-mm-yyyy"><?php echo $mm; ?></span>
-                     /
+                     .
                      <span id="prefix_year" class="format-mm-yyyy"><?php echo $yyyy; ?></span>
                   </span>
                   <?php } ?>
@@ -235,7 +235,7 @@
                     ?>
                   </div>
                   
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <?php $value = (isset($schedule) ? $schedule->reference_no : ''); ?>
                     <?php echo render_input('reference_no','reference_no',$value); ?>
                   </div>
@@ -252,17 +252,7 @@
                         echo render_select('assigned',$staff,array('staffid',array('firstname','lastname')),'assigned_string',$selected);
                         ?>
                   </div>
-                  <div class="col-md-6">
-                       <div class="form-group select-placeholder">
-                        <label for="discount_type" class="control-label"><?php echo _l('discount_type'); ?></label>
-                        <select name="discount_type" class="selectpicker" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                           <option value="" selected><?php echo _l('no_discount'); ?></option>
-                           <option value="before_tax" <?php
-                              if(isset($schedule)){ if($schedule->discount_type == 'before_tax'){ echo 'selected'; }}?>><?php echo _l('discount_type_before_tax'); ?></option>
-                           <option value="after_tax" <?php if(isset($schedule)){if($schedule->discount_type == 'after_tax'){echo 'selected';}} ?>><?php echo _l('discount_type_after_tax'); ?></option>
-                        </select>
-                     </div>
-                  </div>
+
                </div>
                <?php $value = (isset($schedule) ? $schedule->adminnote : ''); ?>
                <?php echo render_textarea('adminnote','schedule_add_edit_admin_note',$value); ?>

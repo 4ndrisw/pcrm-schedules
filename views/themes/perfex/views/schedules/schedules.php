@@ -14,7 +14,7 @@
                     <hr class="hr-panel-heading-dashboard">
                     <?php if (!empty($schedules)) { ?>
                         <div class="table-vertical-scroll">
-                            <table id="schedules-<?php echo $client->userid; ?>" class="table dt-table" data-order-col="2" data-order-type="desc">
+                            <table class="table dt-table" data-order-col="2" data-order-type="desc">
                                 <thead>
                                     <tr>
                                         <th><?php echo _l('schedule_number'); ?> #</th>

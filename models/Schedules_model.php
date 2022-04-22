@@ -40,9 +40,10 @@ class Schedules_model extends App_Model
      */
     public function get($id = '', $where = [])
     {
-        $this->db->select('*,' . db_prefix() . 'currencies.id as currencyid, ' . db_prefix() . 'schedules.id as id, ' . db_prefix() . 'currencies.name as currency_name');
+//        $this->db->select('*,' . db_prefix() . 'currencies.id as currencyid, ' . db_prefix() . 'schedules.id as id, ' . db_prefix() . 'currencies.name as currency_name');
+        $this->db->select('*,' . db_prefix() . 'schedules.id as id');
         $this->db->from(db_prefix() . 'schedules');
-        $this->db->join(db_prefix() . 'currencies', db_prefix() . 'currencies.id = ' . db_prefix() . 'schedules.currency', 'left');
+        //$this->db->join(db_prefix() . 'currencies', db_prefix() . 'currencies.id = ' . db_prefix() . 'schedules.currency', 'left');
         $this->db->where($where);
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'schedules.id', $id);
@@ -152,13 +153,6 @@ class Schedules_model extends App_Model
             $new_invoice_data['duedate'] = _d(date('Y-m-d', strtotime('+' . get_option('invoice_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
         $new_invoice_data['show_quantity_as'] = $_schedule->show_quantity_as;
-        $new_invoice_data['currency']         = $_schedule->currency;
-        $new_invoice_data['subtotal']         = $_schedule->subtotal;
-        $new_invoice_data['total']            = $_schedule->total;
-        $new_invoice_data['adjustment']       = $_schedule->adjustment;
-        $new_invoice_data['discount_percent'] = $_schedule->discount_percent;
-        $new_invoice_data['discount_total']   = $_schedule->discount_total;
-        $new_invoice_data['discount_type']    = $_schedule->discount_type;
         $new_invoice_data['assigned']       = $_schedule->assigned;
         // Since version 1.0.6
         $new_invoice_data['billing_street']   = clear_textarea_breaks($_schedule->billing_street);
@@ -203,7 +197,6 @@ class Schedules_model extends App_Model
             $new_invoice_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
             $new_invoice_data['newitems'][$key]['qty']              = $item['qty'];
             $new_invoice_data['newitems'][$key]['unit']             = $item['unit'];
-            $new_invoice_data['newitems'][$key]['taxname']          = [];
             $taxes                                                  = get_schedule_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
@@ -321,14 +314,7 @@ class Schedules_model extends App_Model
         }
 
         $new_schedule_data['show_quantity_as'] = $_schedule->show_quantity_as;
-        $new_schedule_data['currency']         = $_schedule->currency;
-        $new_schedule_data['subtotal']         = $_schedule->subtotal;
-        $new_schedule_data['total']            = $_schedule->total;
-        $new_schedule_data['adminnote']        = $_schedule->adminnote;
-        $new_schedule_data['adjustment']       = $_schedule->adjustment;
-        $new_schedule_data['discount_percent'] = $_schedule->discount_percent;
-        $new_schedule_data['discount_total']   = $_schedule->discount_total;
-        $new_schedule_data['discount_type']    = $_schedule->discount_type;
+    
         $new_schedule_data['terms']            = $_schedule->terms;
         $new_schedule_data['assigned']       = $_schedule->assigned;
         $new_schedule_data['reference_no']     = $_schedule->reference_no;
@@ -359,7 +345,6 @@ class Schedules_model extends App_Model
             $new_schedule_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
             $new_schedule_data['newitems'][$key]['qty']              = $item['qty'];
             $new_schedule_data['newitems'][$key]['unit']             = $item['unit'];
-            $new_schedule_data['newitems'][$key]['taxname']          = [];
             $taxes                                                   = get_schedule_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
@@ -765,11 +750,6 @@ class Schedules_model extends App_Model
             $affectedRows++;
         }
 
-
-        if ($affectedRows > 0) {
-            update_sales_total_tax_column($id, 'schedule', db_prefix() . 'schedules');
-        }
-
         if ($save_and_send === true) {
             $this->send_schedule_to_client($id, '', true, '', true);
         }
@@ -823,7 +803,7 @@ class Schedules_model extends App_Model
                     }
 
                     // Send thank you email to all contacts with permission schedules
-                    $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'schedule_emails' => 1]);
+                    $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'project_emails' => 1]);
 
                     foreach ($contacts as $contact) {
                         // (To fix merge field) send_mail_template('schedule_accepted_to_customer','schedules', $schedule, $contact);
@@ -998,19 +978,7 @@ class Schedules_model extends App_Model
                     $this->db->update(db_prefix() . 'options');
                 }
             }
-            /*
-            if (total_rows(db_prefix() . 'proposals', [
-                    'schedule_id' => $id,
-                ]) > 0) {
-                $this->db->where('schedule_id', $id);
-                $schedule = $this->db->get(db_prefix() . 'proposals')->row();
-                $this->db->where('id', $schedule->id);
-                $this->db->update(db_prefix() . 'proposals', [
-                    'schedule_id'    => null,
-                    'date_converted' => null,
-                ]);
-            }
-            */
+
             delete_tracked_emails($id, 'schedule');
 
             $this->db->where('relid IN (SELECT id from ' . db_prefix() . 'schedule_items WHERE rel_type="schedule" AND rel_id="' . $this->db->escape_str($id) . '")');
@@ -1067,7 +1035,7 @@ class Schedules_model extends App_Model
                 $this->tasks_model->delete_task($task['id']);
             }
             if ($simpleDelete == false) {
-                log_schedule_activity('Schedules Deleted [Number: ' . $number . ']');
+                $this->log_schedule_activity('Schedules Deleted [Number: ' . $number . ']');
             }
 
             return true;
@@ -1125,7 +1093,7 @@ class Schedules_model extends App_Model
             'is_expiry_notified' => 1,
         ]);
 
-        $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'schedule_emails' => 1]);
+        $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'project_emails' => 1]);
 
         foreach ($contacts as $contact) {
             $template = mail_template('schedule_expiration_reminder', $schedule, $contact);
@@ -1198,7 +1166,7 @@ class Schedules_model extends App_Model
         } else {
             $contacts = $this->clients_model->get_contacts(
                 $schedule->clientid,
-                ['active' => 1, 'schedule_emails' => 1]
+                ['active' => 1, 'project_emails' => 1]
             );
 
             foreach ($contacts as $contact) {

@@ -66,7 +66,7 @@ function add_schedule_item_to_table(data, itemid){
 
   // If not custom data passed get from the preview
   data = typeof (data) == 'undefined' || data == 'undefined' ? get_schedule_item_preview_values() : data;
-  if (data.description === "" && data.long_description === "" && data.rate === "") {
+  if (data.description === "" && data.long_description === "") {
      return;
   }
 

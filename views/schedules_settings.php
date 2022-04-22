@@ -39,7 +39,7 @@
          </div>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="2" id="e_year_based" <?php if(get_option('schedule_number_format') == '2'){echo 'checked';} ?>>
-            <label for="e_year_based"><?php echo _l('settings_sales_schedule_number_format_year_based'); ?> (YYYY/000001)</label>
+            <label for="e_year_based"><?php echo _l('settings_sales_schedule_number_format_year_based'); ?> (YYYY.000001)</label>
          </div>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="3" id="e_short_year_based" <?php if(get_option('schedule_number_format') == '3'){echo 'checked';} ?>>
@@ -47,7 +47,7 @@
          </div>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="4" id="e_year_month_based" <?php if(get_option('schedule_number_format') == '4'){echo 'checked';} ?>>
-            <label for="e_year_month_based">000001/MM/YYYY</label>
+            <label for="e_year_month_based">000001.MM.YYYY</label>
          </div>
          <hr />
       </div>

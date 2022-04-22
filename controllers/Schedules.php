@@ -131,7 +131,7 @@ class Schedules extends AdminController
             $template_name = 'schedule_send_to_customer_already_sent';
         }
 
-        $data = prepare_mail_preview_data($template_name, $schedule->clientid);
+        $data = schedule_mail_preview_data($template_name, $schedule->clientid);
 
         $data['schedule_members'] = $this->schedules_model->get_schedule_members($id,true);
 
@@ -160,7 +160,7 @@ class Schedules extends AdminController
 
 
     /* Add new schedule */
-    public function add()
+    public function create()
     {
         if ($this->input->post()) {
             $schedule_data = $this->input->post();
@@ -171,73 +171,32 @@ class Schedules extends AdminController
                 $save_and_send_later = true;
             }
 
-            /*if ($id == '') {*/
-                if (!has_permission('schedules', '', 'create')) {
-                    access_denied('schedules');
-                }
-                $id = $this->schedules_model->add($schedule_data);
-
-                if ($id) {
-                    set_alert('success', _l('added_successfully', _l('schedule')));
-
-                    $redUrl = admin_url('schedules/schedule/' . $id);
-
-                    if ($save_and_send_later) {
-                        $this->session->set_userdata('send_later', true);
-                        // die(redirect($redUrl));
-                    }
-
-                    redirect(
-                        !$this->set_schedule_pipeline_autoload($id) ? $redUrl : admin_url('schedules/schedule/')
-                    );
-                }
-            /*}*/
-            /* else {
-                if (!has_permission('schedules', '', 'edit')) {
-                    access_denied('schedules');
-                }
-                $success = $this->schedules_model->update($schedule_data, $id);
-                if ($success) {
-                    set_alert('success', _l('updated_successfully', _l('schedule')));
-                }
-                if ($this->set_schedule_pipeline_autoload($id)) {
-                    redirect(admin_url('schedules/schedule/'));
-                } else {
-                    redirect(admin_url('schedules/schedule/' . $id));
-                }
-            }*/
-        }
-        /*
-        if ($id == '') { */
-            $title = _l('create_new_schedule');
-        
-        /*} else {
-
-            $schedule = $this->schedules_model->get($id);
-
-            if (!$schedule || !user_can_view_schedule($id)) {
-                blank_page(_l('schedule_not_found'));
+            if (!has_permission('schedules', '', 'create')) {
+                access_denied('schedules');
             }
+            $id = $this->schedules_model->add($schedule_data);
 
-            $data['schedule'] = $schedule;
-            $data['edit']     = true;
-            $title            = _l('edit', _l('schedule_lowercase'));
-        }*/
+            if ($id) {
+                set_alert('success', _l('added_successfully', _l('schedule')));
+
+                $redUrl = admin_url('schedules/schedule/' . $id);
+
+                if ($save_and_send_later) {
+                    $this->session->set_userdata('send_later', true);
+                    // die(redirect($redUrl));
+                }
+
+                redirect(
+                    !$this->set_schedule_pipeline_autoload($id) ? $redUrl : admin_url('schedules/schedule/')
+                );
+            }
+        }
+        $title = _l('create_new_schedule');
 
         if ($this->input->get('customer_id')) {
             $data['customer_id'] = $this->input->get('customer_id');
         }
-
-
-        $this->load->model('taxes_model');
-        $data['taxes'] = $this->taxes_model->get();
-        $this->load->model('currencies_model');
-        $data['currencies'] = $this->currencies_model->get();
-
-        $data['base_currency'] = $this->currencies_model->get_base_currency();
-
-        $this->load->model('invoice_items_model');
-
+        /*
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
             $data['items'] = $this->invoice_items_model->get_grouped();
@@ -245,7 +204,7 @@ class Schedules extends AdminController
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        */
 
         $data['staff']             = $this->staff_model->get('', ['active' => 1]);
         $data['schedule_statuses'] = $this->schedules_model->get_statuses();
@@ -322,29 +281,6 @@ class Schedules extends AdminController
         if ($this->input->get('customer_id')) {
             $data['customer_id'] = $this->input->get('customer_id');
         }
-/*
-        if ($this->input->get('schedule_request_id')) {
-            $data['schedule_request_id'] = $this->input->get('schedule_request_id');
-        }
-
-        $this->load->model('taxes_model');
-        $data['taxes'] = $this->taxes_model->get();
-        $this->load->model('currencies_model');
-        $data['currencies'] = $this->currencies_model->get();
-
-        $data['base_currency'] = $this->currencies_model->get_base_currency();
-
-        $this->load->model('invoice_items_model');
-
-        $data['ajaxItems'] = false;
-        if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
-        } else {
-            $data['items']     = [];
-            $data['ajaxItems'] = true;
-        }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
-*/
 
 
         $data['schedule_members']  = $this->schedules_model->get_schedule_members($id);
@@ -459,7 +395,7 @@ class Schedules extends AdminController
             $template_name = 'schedule_send_to_customer_already_sent';
         }
 
-        //$data = prepare_mail_preview_data($template_name, $schedule->clientid);
+        //$data = schedule_mail_preview_data($template_name, $schedule->clientid);
         $data = schedule_mail_preview_data($template_name, $schedule->clientid);
 
         $data['activity']          = $this->schedules_model->get_schedule_activity($id);
@@ -705,7 +641,7 @@ class Schedules extends AdminController
             }
         }
         if (!$id) {
-            redirect(admin_url('schedules/schedule'));
+            redirect(admin_url('schedules'));
         }
         $schedule        = $this->schedules_model->get($id);
         $schedule_number = format_schedule_number($schedule->id);

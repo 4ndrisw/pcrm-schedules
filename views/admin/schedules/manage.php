@@ -17,7 +17,7 @@
                     <?php render_datatable(array(
                         _l('schedule_subject'),
                         _l('schedule_company'),
-                        _l('schedule_project'),
+                        _l('schedule_list_project'),
                         //_l('schedule_projects_name'),
                         _l('schedule_status'),
                         _l('schedule_start_date'),
