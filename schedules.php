@@ -5,7 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /*
 Module Name: Schedules
 Description: Default module for defining schedules
-Version: 2.3.0
+Version: 1.0.2
 Requires at least: 2.3.*
 */
 
@@ -198,26 +198,6 @@ function get_schedule_type($key)
         }
     }
 }
-
-
-// Add options for schedules
-add_option('delete_only_on_last_schedule', 1);
-add_option('schedule_prefix', 'SCH-');
-add_option('next_schedule_number', 1);
-add_option('schedule_number_decrement_on_delete', 0);
-add_option('schedule_number_format', 4);
-add_option('schedule_year', date('Y'));
-add_option('schedule_auto_convert_to_invoice_on_client_accept', 1);
-add_option('exclude_schedule_from_client_area_with_draft_status', 1);
-
-add_option('predefined_clientnote_schedule', '- Staf diatas untuk melakukan riksa uji pada peralatan tersebut.<br />
-- Staf diatas untuk membuat dokumentasi riksa uji sesuai kebutuhan.');
-
-add_option('predefined_terms_schedule', '- Pelaksanaan riksa uji harus mengikuti prosedur yang ditetapkan perusahaan pemilik alat.<br />
-- Dilarang membuat dokumentasi tanpa seizin perusahaan pemilik alat.');
-/**
-* Load the module helper
-*/
 
 
 $CI = &get_instance();

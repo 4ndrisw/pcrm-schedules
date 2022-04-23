@@ -101,7 +101,6 @@ if (!$CI->db->table_exists(db_prefix() . 'schedule_activity')) {
       MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1');
 }
 
-
 if (!$CI->db->table_exists(db_prefix() . 'schedule_items')) {
     $CI->db->query('CREATE TABLE `' . db_prefix() . "schedule_items` (
       `id` int(11) NOT NULL,
@@ -121,3 +120,28 @@ if (!$CI->db->table_exists(db_prefix() . 'schedule_items')) {
     $CI->db->query('ALTER TABLE `' . db_prefix() . 'schedule_items`
       MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1');
 }
+
+
+// Add options for schedules
+add_option('delete_only_on_last_schedule', 1);
+add_option('schedule_prefix', 'SCH-');
+add_option('next_schedule_number', 1);
+add_option('schedule_number_decrement_on_delete', 0);
+add_option('schedule_number_format', 4);
+add_option('schedule_year', date('Y'));
+add_option('schedule_auto_convert_to_invoice_on_client_accept', 1);
+add_option('exclude_schedule_from_client_area_with_draft_status', 1);
+add_option('predefined_clientnote_schedule', '- Staf diatas untuk melakukan riksa uji pada peralatan tersebut.<br />
+- Staf diatas untuk membuat dokumentasi riksa uji sesuai kebutuhan.');
+add_option('predefined_terms_schedule', '- Pelaksanaan riksa uji harus mengikuti prosedur yang ditetapkan perusahaan pemilik alat.<br />
+- Dilarang membuat dokumentasi tanpa seizin perusahaan pemilik alat.');
+add_option('schedule_due_after', 7);
+add_option('allow_staff_view_schedules_assigned', 1);
+add_option('view_schedule_only_logged_in', 1);
+add_option('show_project_on_schedule', 1);
+add_option('schedules_pipeline_limit', 1);
+add_option('default_schedules_pipeline_sort', 1);
+
+/**
+* Load the module helper
+*/
