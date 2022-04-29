@@ -1,2 +1,6 @@
 
 .schedule-update{ background-color:#ddd; }
+
+body .schedule-preview .schedule-items table tbody td.description span{
+    color: #d1d3ea;
+}

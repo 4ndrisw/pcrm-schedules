@@ -55,7 +55,7 @@ class Schedule_items_table extends App_items_table_template
              * Item description
              */
             if (!empty($item['description'])) {
-                $itemHTML .= '<span style="font-size:' . $this->get_pdf_font_size() . 'px;"><strong>'
+                $itemHTML .= '<span class="description" style="font-size:' . 12 . 'px;"><strong>'
                 . $this->period_merge_field($item['description'])
                 . '</strong></span>';
 
@@ -68,7 +68,7 @@ class Schedule_items_table extends App_items_table_template
              * Item long description
              */
             if (!empty($item['long_description'])) {
-                $itemHTML .= '<span style="color:#424242;">' . $this->period_merge_field($item['long_description']) . '</span>';
+                $itemHTML .= '<span class="long-description">' . $this->period_merge_field($item['long_description']) . '</span>';
             }
 
             $itemHTML .= '</td>';
