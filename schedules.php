@@ -26,6 +26,7 @@ hooks()->add_filter('migration_tables_to_replace_old_links', 'schedules_migratio
 hooks()->add_filter('global_search_result_query', 'schedules_global_search_result_query', 10, 3);
 hooks()->add_filter('global_search_result_output', 'schedules_global_search_result_output', 10, 2);
 hooks()->add_filter('get_dashboard_widgets', 'schedules_add_dashboard_widget');
+hooks()->add_filter('module_schedules_action_links', 'module_schedules_action_links');
 
 
 function schedules_add_dashboard_widget($widgets)
@@ -51,7 +52,7 @@ function schedules_staff_member_deleted($data)
 function schedules_global_search_result_output($output, $data)
 {
     if ($data['type'] == 'schedules') {
-        $output = '<a href="' . admin_url('schedules/schedule/' . $data['result']['id']) . '">' . $data['result']['subject'] . '</a>';
+        $output = '<a href="' . admin_url('schedules/schedule/' . $data['result']['id']) . '">' . format_schedule_number($data['result']['number']) . '</a>';
     }
 
     return $output;
@@ -62,9 +63,10 @@ function schedules_global_search_result_query($result, $q, $limit)
     $CI = &get_instance();
     if (has_permission('schedules', '', 'view')) {
         // Schedules
-        $CI->db->select()->from(db_prefix() . 'schedules')->like('description', $q)->or_like('subject', $q)->limit($limit);
-
-        $CI->db->order_by('subject', 'ASC');
+        $CI->db->select()->from(db_prefix() . 'schedules')->like(db_prefix() . 'projects.name', $q)->or_like(db_prefix() . 'clients.company', $q)->limit($limit);
+        $CI->db->join(db_prefix() . 'projects',db_prefix() . 'schedules.project_id='.db_prefix() .'projects.id', 'left');
+        $CI->db->join(db_prefix() . 'clients',db_prefix() . 'schedules.clientid='.db_prefix() .'clients.userid', 'left');
+        $CI->db->order_by(db_prefix() . 'projects.name', 'ASC');
 
         $result[] = [
                 'result'         => $CI->db->get()->result_array(),
@@ -169,6 +171,13 @@ function schedules_module_init_menu_items()
                 'position' => 12,
         ]);
     }
+}
+
+function module_schedules_action_links($actions)
+{
+    $actions[] = '<a href="' . admin_url('settings?group=schedules') . '">' . _l('settings') . '</a>';
+
+    return $actions;
 }
 
 function schedules_clients_area_menu_items()
