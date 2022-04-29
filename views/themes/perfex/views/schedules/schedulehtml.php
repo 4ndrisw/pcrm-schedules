@@ -14,7 +14,7 @@
       <div class="container preview-sticky-container">
          <div class="row">
             <div class="col-md-12">
-               
+
                <div class="col-md-2">
                   <h3 class="bold no-mtop schedule-html-number no-mbot">
                      <span class="sticky-visible hide">
@@ -110,7 +110,7 @@
                   <?php if(!empty($schedule_members)){ ?>
                      <strong><?= _l('schedule_members_name') ?></strong>
                      <ul class="schedule_members">
-                     <?php 
+                     <?php
                         foreach($schedule_members as $member){
                           echo ('<li style="list-style:auto" class="member">' . $member['firstname'] .' '. $member['lastname'] .'</li>');
                          }
@@ -154,7 +154,7 @@
                </p>
                <?php } ?>
             </div>
-         </div>   
+         </div>
          <div class="row">
             <div class="col-md-12">
                <div class="table-responsive">
@@ -166,7 +166,7 @@
             </div>
 
             <?php if($schedule->assigned != 0 && get_option('show_assigned_on_schedules') == 1){ ?>
-            
+
             <div class="col-md-12">
                <div class="col-md-12 schedule-html-sale-agent">
                   <div class="bold"><?php echo _l('assigned_string'); ?>:</div>
