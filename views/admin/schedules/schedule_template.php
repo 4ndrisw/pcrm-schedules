@@ -252,6 +252,10 @@
                         echo render_select('assigned',$staff,array('staffid',array('firstname','lastname')),'assigned_string',$selected);
                         ?>
                   </div>
+                  <div class="col-md-12">
+                    <?php $value = (isset($schedule) ? $schedule->inspector_name : ''); ?>
+                    <?php echo render_input('inspector_name','inspector_name',$value); ?>
+                  </div>
 
                </div>
                <?php $value = (isset($schedule) ? $schedule->adminnote : ''); ?>
