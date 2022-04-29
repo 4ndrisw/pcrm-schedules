@@ -192,22 +192,6 @@ function schedules_clients_area_menu_items()
     }
 }
 
-/**
- * Get schedule type by given key
- *
- * @param  int $key
- *
- * @return array
- */
-function get_schedule_type($key)
-{
-    foreach (get_schedule_types() as $type) {
-        if ($type['key'] == $key) {
-            return $type;
-        }
-    }
-}
-
 
 $CI = &get_instance();
 $CI->load->helper(SCHEDULES_MODULE_NAME . '/schedules');
