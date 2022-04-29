@@ -166,7 +166,7 @@ function schedules_module_init_menu_items()
         $CI->app_menu->add_sidebar_menu_item('schedules', [
                 'slug'     => 'schedules-tracking',
                 'name'     => _l('schedules'),
-                'icon'     => 'fa fa-map-marker',
+                'icon'     => 'fa fa-calendar',
                 'href'     => admin_url('schedules'),
                 'position' => 12,
         ]);
