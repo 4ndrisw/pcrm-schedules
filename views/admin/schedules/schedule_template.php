@@ -45,7 +45,7 @@
                   <?php include_once(module_views_path('schedules','admin/schedules/billing_and_shipping_template.php')); ?>
                </div>
                <div class="col-md-6">
-                  <p class="bold"><?php echo _l('invoice_bill_to'); ?></p>
+                  <p class="bold"><?php echo _l('bill_to'); ?></p>
                   <address>
                      <span class="billing_street">
                      <?php $billing_street = (isset($schedule) ? $schedule->billing_street : '--'); ?>
@@ -144,8 +144,6 @@
                 }
                }
                
-               //$__number = 8; //----- test
-
                $_schedule_number = str_pad($__number, get_option('number_padding_prefixes'), '0', STR_PAD_LEFT);
                $isedit = isset($schedule) ? 'true' : 'false';
                $data_original_number = isset($schedule) ? $schedule->number : 'false';
@@ -159,7 +157,7 @@
                    <?php }
                     echo $prefix;
                   ?>
-                 </span>
+                  </span>
                   <input type="text" name="number" class="form-control" value="<?php echo $_schedule_number; ?>" data-isedit="<?php echo $isedit; ?>" data-original-number="<?php echo $data_original_number; ?>">
                   <?php if($format == 3) { ?>
                   <span class="input-group-addon">
@@ -181,16 +179,7 @@
                   <?php echo render_date_input('date','schedule_add_edit_date',$value); ?>
                </div>
                <div class="col-md-6">
-                  <?php
-                  $value = '';
-                  if(isset($schedule)){
-                    $value = _d($schedule->expirydate);
-                  } else {
-                      if(get_option('schedule_due_after') != 0){
-                          $value = _d(date('Y-m-d', strtotime('+' . get_option('schedule_due_after') . ' DAY', strtotime(date('Y-m-d')))));
-                      }
-                  }
-                  echo render_date_input('expirydate','schedule_add_edit_expirydate',$value); ?>
+                  
                </div>
             </div>
             <div class="clearfix mbot15"></div>
@@ -220,28 +209,13 @@
                      </div>
                   </div>
 
-
-                  <div class="col-md-6">
-                    <?php
-                      $selected = array();
-                      if(isset($schedule_members)){
-                         foreach($schedule_members as $member){
-                            array_push($selected,$member['staff_id']);
-                         }
-                      } else {
-                         array_push($selected,get_staff_user_id());
-                      }
-                      echo render_select('schedule_members[]',$staff,array('staffid',array('firstname','lastname')),'schedule_members',$selected,array('multiple'=>true,'data-actions-box'=>true),array(),'','',false);
-                    ?>
-                  </div>
-                  
                   <div class="col-md-6">
                     <?php $value = (isset($schedule) ? $schedule->reference_no : ''); ?>
                     <?php echo render_input('reference_no','reference_no',$value); ?>
                   </div>
                   <div class="col-md-6">
                          <?php
-                        $selected = '';
+                        $selected = get_option('default_schedule_assigned');
                         foreach($staff as $member){
                          if(isset($schedule)){
                            if($schedule->assigned == $member['staffid']) {
@@ -249,14 +223,9 @@
                            }
                          }
                         }
-                        echo render_select('assigned',$staff,array('staffid',array('firstname','lastname')),'assigned_string',$selected);
+                        echo render_select('assigned',$staff,array('staffid',array('firstname','lastname')),'schedule_assigned_string',$selected);
                         ?>
                   </div>
-                  <div class="col-md-12">
-                    <?php $value = (isset($schedule) ? $schedule->inspector_name : ''); ?>
-                    <?php echo render_input('inspector_name','inspector_name',$value); ?>
-                  </div>
-
                </div>
                <?php $value = (isset($schedule) ? $schedule->adminnote : ''); ?>
                <?php echo render_textarea('adminnote','schedule_add_edit_admin_note',$value); ?>

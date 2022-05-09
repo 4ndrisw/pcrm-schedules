@@ -274,26 +274,6 @@ function schedule_number_format($number, $format, $applied_prefix, $date)
 }
 
 /**
- * Function that return schedule item taxes based on passed item id
- * @param  mixed $itemid
- * @return array
- */
-function get_schedule_item_taxes($itemid)
-{
-    $CI = &get_instance();
-    $CI->db->where('itemid', $itemid);
-    $CI->db->where('rel_type', 'schedule');
-    $taxes = $CI->db->get(db_prefix() . 'item_tax')->result_array();
-    $i     = 0;
-    foreach ($taxes as $tax) {
-        $taxes[$i]['taxname'] = $tax['taxname'] . '|' . $tax['taxrate'];
-        $i++;
-    }
-
-    return $taxes;
-}
-
-/**
  * Calculate schedules percent by status
  * @param  mixed $status          schedule status
  * @return array
@@ -419,9 +399,7 @@ function user_can_view_schedule($id, $staff_id = false)
  */
 function schedule_pdf($schedule, $tag = '')
 {
-    //module_libs_path(SCHEDULES_MODULE_NAME, 'libraries');
     return app_pdf('schedule',  module_libs_path(SCHEDULES_MODULE_NAME) . 'pdf/Schedule_pdf', $schedule, $tag);
-    //return app_pdf('schedule',  LIBSPATH . 'pdf/Estimate_pdf', $schedule, $tag);
 }
 
 
@@ -467,7 +445,6 @@ function add_new_schedule_item_post($item, $rel_id, $rel_type)
                     'description'      => $item['description'],
                     'long_description' => nl2br($item['long_description']),
                     'qty'              => $item['qty'],
-                    //'rate'             => number_format($item['rate'], get_decimal_places(), '.', ''),
                     'rel_id'           => $rel_id,
                     'rel_type'         => $rel_type,
                     'item_order'       => $item['order'],
@@ -504,7 +481,6 @@ function update_schedule_item_post($item_id, $data, $field = '')
             'item_order'       => $data['order'],
             'description'      => $data['description'],
             'long_description' => nl2br($data['long_description']),
-            'rate'             => number_format($data['rate'], get_decimal_places(), '.', ''),
             'qty'              => $data['qty'],
             'unit'             => $data['unit'],
         ];
@@ -567,20 +543,6 @@ function get_schedule_upload_path($type=NULL)
 }
 
 
-/**
- * [perfex_dark_theme_settings_tab net menu item in setup->settings]
- * @return void
- */
-function schedules_settings_tab()
-{
-    $CI = &get_instance();
-    $CI->app_tabs->add_settings_tab('schedules', [
-        'name'     => _l('settings_group_schedules'),
-        //'view'     => module_views_path(SCHEDULES_MODULE_NAME, 'admin/settings/includes/schedules'),
-        'view'     => 'schedules/schedules_settings',
-        'position' => 50,
-    ]);
-}
 
 
 /**
@@ -590,7 +552,8 @@ function schedules_settings_tab()
 function schedules_head_component()
 {
     $CI = &get_instance();
-    if ($CI->uri->segment(1) == 'admin' && $CI->uri->segment(2) == 'schedules'){
+    if (($CI->uri->segment(1) == 'admin' && $CI->uri->segment(2) == 'schedules') ||
+        $CI->uri->segment(1) == 'schedules'){
         echo '<link href="' . base_url('modules/schedules/assets/css/schedules.css') . '"  rel="stylesheet" type="text/css" >';
     }
 }
@@ -637,16 +600,6 @@ function _format_data_schedule_feature($data)
         $data['data']['adminnote'] = nl2br($data['data']['adminnote']);
     }
 
-    if ((isset($data['data']['adjustment']) && !is_numeric($data['data']['adjustment'])) || !isset($data['data']['adjustment'])) {
-        $data['data']['adjustment'] = 0;
-    } elseif (isset($data['data']['adjustment']) && is_numeric($data['data']['adjustment'])) {
-        $data['data']['adjustment'] = number_format($data['data']['adjustment'], get_decimal_places(), '.', '');
-    }
-
-    if (isset($data['data']['discount_total']) && $data['data']['discount_total'] == 0) {
-        $data['data']['discount_type'] = '';
-    }
-
     foreach (['country', 'billing_country', 'shipping_country', 'project_id', 'assigned'] as $should_be_zero) {
         if (isset($data['data'][$should_be_zero]) && $data['data'][$should_be_zero] == '') {
             $data['data'][$should_be_zero] = 0;
@@ -656,31 +609,7 @@ function _format_data_schedule_feature($data)
     return $data;
 }
 
-function __format_data_client($data, $id = null)
-{
-    foreach (__get_client_unused_names() as $u) {
-        if (isset($data[$u])) {
-            unset($data[$u]);
-        }
-    }
 
-    if (isset($data['address'])) {
-        $data['address'] = trim($data['address']);
-        $data['address'] = nl2br($data['address']);
-    }
-
-    if (isset($data['billing_street'])) {
-        $data['billing_street'] = trim($data['billing_street']);
-        $data['billing_street'] = nl2br($data['billing_street']);
-    }
-
-    if (isset($data['shipping_street'])) {
-        $data['shipping_street'] = trim($data['shipping_street']);
-        $data['shipping_street'] = nl2br($data['shipping_street']);
-    }
-
-    return $data;
-}
 /**
  * Unsed $_POST request names, mostly they are used as helper inputs in the form
  * The top function will check all of them and unset from the $data
@@ -705,12 +634,66 @@ function _get_schedule_feature_unused_names()
     ];
 }
 
-function __get_client_unused_names()
+/**
+ * When item is removed eq from invoice will be stored in removed_items in $_POST
+ * With foreach loop this function will remove the item from database and it's taxes
+ * @param  mixed $id       item id to remove
+ * @param  string $rel_type item relation eq. invoice, estimate
+ * @return boolena
+ */
+function handle_removed_schedule_item_post($id, $rel_type)
 {
-    return [
-        'fakeusernameremembered', 'fakepasswordremembered',
-        'DataTables_Table_0_length', 'DataTables_Table_1_length',
-        'onoffswitch', 'passwordr', 'permissions', 'send_set_password_email',
-        'donotsendwelcomeemail',
-    ];
+    $CI = &get_instance();
+
+    $CI->db->where('id', $id);
+    $CI->db->where('rel_type', $rel_type);
+    $CI->db->delete(db_prefix() . 'itemable');
+    if ($CI->db->affected_rows() > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
+ * Injects theme CSS
+ * @return null
+ */
+function schedule_head_component()
+{
+}
+
+$CI = &get_instance();
+// Check if schedule is excecuted
+if ($CI->uri->segment(1)=='schedules') {
+    hooks()->add_action('app_customers_head', 'schedule_app_client_includes');
+}
+
+/**
+ * Theme clients footer includes
+ * @return stylesheet
+ */
+function schedule_app_client_includes()
+{
+    echo '<link href="' . base_url('modules/' .SCHEDULES_MODULE_NAME. '/assets/css/schedules.css') . '"  rel="stylesheet" type="text/css" >';
+    echo '<script src="' . module_dir_url('' .SCHEDULES_MODULE_NAME. '', 'assets/js/schedules.js') . '"></script>';
+}
+
+
+function after_schedule_updated($id){
+
+
+}
+
+function schedule_create_assigned_qrcode_hook($id){
+     
+     log_activity( 'Hello, world!' );
+
+}
+
+function schedule_status_changed_hook($data){
+
+    log_activity('schedule_status_changed');
+
 }

@@ -130,165 +130,120 @@ class Schedules_model extends App_Model
         return false;
     }
 
-    /**
-     * Convert schedule to invoice
-     * @param mixed $id schedule id
-     * @return mixed     New invoice ID
-     */
-    public function convert_to_invoice($id, $client = false, $draft_invoice = false)
-    {
-        // Recurring invoice date is okey lets convert it to new invoice
-        $_schedule = $this->get($id);
 
-        $new_invoice_data = [];
-        if ($draft_invoice == true) {
-            $new_invoice_data['save_as_draft'] = true;
+    /**
+     * Convert schedule to jobreport
+     * @param mixed $id schedule id
+     * @return mixed     New jobreport ID
+     */
+    public function convert_to_jobreport($id, $client = false, $draft_jobreport = false)
+    {
+        // Recurring jobreport date is okey lets convert it to new jobreport
+        $_schedule = $this->get($id);
+        $new_jobreport_data = [];
+        if ($draft_jobreport == true) {
+            $new_jobreport_data['save_as_draft'] = true;
         }
-        $new_invoice_data['clientid']   = $_schedule->clientid;
-        $new_invoice_data['schedule_id'] = $_schedule->id;
-        $new_invoice_data['number']     = get_option('next_invoice_number');
-        $new_invoice_data['date']       = _d(date('Y-m-d'));
-        $new_invoice_data['duedate']    = _d(date('Y-m-d'));
-        if (get_option('invoice_due_after') != 0) {
-            $new_invoice_data['duedate'] = _d(date('Y-m-d', strtotime('+' . get_option('invoice_due_after') . ' DAY', strtotime(date('Y-m-d')))));
-        }
-        $new_invoice_data['show_quantity_as'] = $_schedule->show_quantity_as;
-        $new_invoice_data['assigned']       = $_schedule->assigned;
+        $new_jobreport_data['clientid']   = $_schedule->clientid;
+        $new_jobreport_data['project_id']   = $_schedule->project_id;
+        $new_jobreport_data['schedule_id'] = $_schedule->id;
+        $new_jobreport_data['number']     = get_option('next_jobreport_number');
+        $new_jobreport_data['date']       = _d(date('Y-m-d'));
+
+        $new_jobreport_data['show_quantity_as'] = $_schedule->show_quantity_as;
+        //$new_jobreport_data['assigned']       = get_option('default_jobreport_assigned');
         // Since version 1.0.6
-        $new_invoice_data['billing_street']   = clear_textarea_breaks($_schedule->billing_street);
-        $new_invoice_data['billing_city']     = $_schedule->billing_city;
-        $new_invoice_data['billing_state']    = $_schedule->billing_state;
-        $new_invoice_data['billing_zip']      = $_schedule->billing_zip;
-        $new_invoice_data['billing_country']  = $_schedule->billing_country;
-        $new_invoice_data['shipping_street']  = clear_textarea_breaks($_schedule->shipping_street);
-        $new_invoice_data['shipping_city']    = $_schedule->shipping_city;
-        $new_invoice_data['shipping_state']   = $_schedule->shipping_state;
-        $new_invoice_data['shipping_zip']     = $_schedule->shipping_zip;
-        $new_invoice_data['shipping_country'] = $_schedule->shipping_country;
+        $new_jobreport_data['billing_street']   = clear_textarea_breaks($_schedule->billing_street);
+        $new_jobreport_data['billing_city']     = $_schedule->billing_city;
+        $new_jobreport_data['billing_state']    = $_schedule->billing_state;
+        $new_jobreport_data['billing_zip']      = $_schedule->billing_zip;
+        $new_jobreport_data['billing_country']  = $_schedule->billing_country;
+        $new_jobreport_data['shipping_street']  = clear_textarea_breaks($_schedule->shipping_street);
+        $new_jobreport_data['shipping_city']    = $_schedule->shipping_city;
+        $new_jobreport_data['shipping_state']   = $_schedule->shipping_state;
+        $new_jobreport_data['shipping_zip']     = $_schedule->shipping_zip;
+        $new_jobreport_data['shipping_country'] = $_schedule->shipping_country;
 
         if ($_schedule->include_shipping == 1) {
-            $new_invoice_data['include_shipping'] = 1;
+            $new_jobreport_data['include_shipping'] = 1;
         }
 
-        $new_invoice_data['show_shipping_on_invoice'] = $_schedule->show_shipping_on_schedule;
-        $new_invoice_data['terms']                    = get_option('predefined_terms_invoice');
-        $new_invoice_data['clientnote']               = get_option('predefined_clientnote_invoice');
+        $number = get_option('next_jobreport_number');
+        $format = get_option('jobreport_number_format');
+        $prefix = get_option('jobreport_prefix');
+        $date = date('Y-m-d');
+        
+        $new_jobreport_data['formatted_number'] = jobreport_number_format($number, $format, $prefix, $date);
+
+
+
+        $new_jobreport_data['show_shipping_on_jobreport'] = $_schedule->show_shipping_on_schedule;
+        $new_jobreport_data['terms']                    = get_option('predefined_terms_jobreport');
+        $new_jobreport_data['clientnote']               = get_option('predefined_clientnote_jobreport');
         // Set to unpaid status automatically
-        $new_invoice_data['status']    = 1;
-        $new_invoice_data['adminnote'] = '';
+        $new_jobreport_data['status']    = 1;
+        $new_jobreport_data['adminnote'] = '';
 
-        $this->load->model('payment_modes_model');
-        $modes = $this->payment_modes_model->get('', [
-            'expenses_only !=' => 1,
-        ]);
-        $temp_modes = [];
-        foreach ($modes as $mode) {
-            if ($mode['selected_by_default'] == 0) {
-                continue;
-            }
-            $temp_modes[] = $mode['id'];
-        }
-        $new_invoice_data['allowed_payment_modes'] = $temp_modes;
-        $new_invoice_data['newitems']              = [];
+        $new_jobreport_data['newitems']              = [];
+
         $custom_fields_items                       = get_custom_fields('items');
         $key                                       = 1;
         foreach ($_schedule->items as $item) {
-            $new_invoice_data['newitems'][$key]['description']      = $item['description'];
-            $new_invoice_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
-            $new_invoice_data['newitems'][$key]['qty']              = $item['qty'];
-            $new_invoice_data['newitems'][$key]['unit']             = $item['unit'];
-            $taxes                                                  = get_schedule_item_taxes($item['id']);
-            foreach ($taxes as $tax) {
-                // tax name is in format TAX1|10.00
-                array_push($new_invoice_data['newitems'][$key]['taxname'], $tax['taxname']);
-            }
-            $new_invoice_data['newitems'][$key]['rate']  = $item['rate'];
-            $new_invoice_data['newitems'][$key]['order'] = $item['item_order'];
-            foreach ($custom_fields_items as $cf) {
-                $new_invoice_data['newitems'][$key]['custom_fields']['items'][$cf['id']] = get_custom_field_value($item['id'], $cf['id'], 'items', false);
-
-                if (!defined('COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST')) {
-                    define('COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST', true);
-                }
-            }
+            $new_jobreport_data['newitems'][$key]['description']      = $item['description'];
+            $new_jobreport_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
+            $new_jobreport_data['newitems'][$key]['qty']              = $item['qty'];
+            $new_jobreport_data['newitems'][$key]['unit']             = $item['unit'];
+            $new_jobreport_data['newitems'][$key]['order'] = $item['item_order'];
             $key++;
         }
-        $this->load->model('invoices_model');
-        $id = $this->invoices_model->add($new_invoice_data);
+
+        include_once(FCPATH . 'modules/jobreports/models/Jobreports_model.php');
+
+        $this->load->model('jobreports_model');
+
+        $id = $this->jobreports_model->add($new_jobreport_data);
         if ($id) {
-            // Customer accepted the schedule and is auto converted to invoice
+            // Customer accepted the schedule and is auto converted to jobreport
             if (!is_staff_logged_in()) {
-                $this->db->where('rel_type', 'invoice');
+                $this->db->where('rel_type', 'jobreport');
                 $this->db->where('rel_id', $id);
                 $this->db->delete(db_prefix() . 'schedule_activity');
-                $this->invoices_model->log_invoice_activity($id, 'invoice_activity_auto_converted_from_schedule', true, serialize([
-                    '<a href="' . admin_url('schedules/list_schedules/' . $_schedule->id) . '">' . format_schedule_number($_schedule->id) . '</a>',
+                $this->jobreports_model->log_jobreport_activity($id, 'jobreport_activity_auto_converted_from_schedule', true, serialize([
+                    '<a href="' . admin_url('schedules/schedule/' . $_schedule->id) . '">' . format_schedule_number($_schedule->id) . '</a>',
                 ]));
             }
-            // For all cases update addefrom and sale agent from the invoice
+            // For all cases update addefrom and sale agent from the jobreport
             // May happen staff is not logged in and these values to be 0
             $this->db->where('id', $id);
-            $this->db->update(db_prefix() . 'invoices', [
+            $this->db->update(db_prefix() . 'jobreports', [
                 'addedfrom'  => $_schedule->addedfrom,
-                'assigned' => $_schedule->assigned,
+                'assigned' => get_option('default_jobreport_assigned'),
             ]);
 
-            // Update schedule with the new invoice data and set to status accepted
-            $this->db->where('id', $_schedule->id);
-            $this->db->update(db_prefix() . 'schedules', [
-                'invoiced_date' => date('Y-m-d H:i:s'),
-                'invoiceid'     => $id,
-                'status'        => 4,
-            ]);
-
-
-            if (is_custom_fields_smart_transfer_enabled()) {
-                $this->db->where('fieldto', 'schedule');
-                $this->db->where('active', 1);
-                $cfSchedules = $this->db->get(db_prefix() . 'customfields')->result_array();
-                foreach ($cfSchedules as $field) {
-                    $tmpSlug = explode('_', $field['slug'], 2);
-                    if (isset($tmpSlug[1])) {
-                        $this->db->where('fieldto', 'invoice');
-
-                        $this->db->group_start();
-                        $this->db->like('slug', 'invoice_' . $tmpSlug[1], 'after');
-                        $this->db->where('type', $field['type']);
-                        $this->db->where('options', $field['options']);
-                        $this->db->where('active', 1);
-                        $this->db->group_end();
-
-                        // $this->db->where('slug LIKE "invoice_' . $tmpSlug[1] . '%" AND type="' . $field['type'] . '" AND options="' . $field['options'] . '" AND active=1');
-                        $cfTransfer = $this->db->get(db_prefix() . 'customfields')->result_array();
-
-                        // Don't make mistakes
-                        // Only valid if 1 result returned
-                        // + if field names similarity is equal or more then CUSTOM_FIELD_TRANSFER_SIMILARITY%
-                        if (count($cfTransfer) == 1 && ((similarity($field['name'], $cfTransfer[0]['name']) * 100) >= CUSTOM_FIELD_TRANSFER_SIMILARITY)) {
-                            $value = get_custom_field_value($_schedule->id, $field['id'], 'schedule', false);
-
-                            if ($value == '') {
-                                continue;
-                            }
-
-                            $this->db->insert(db_prefix() . 'customfieldsvalues', [
-                                'relid'   => $id,
-                                'fieldid' => $cfTransfer[0]['id'],
-                                'fieldto' => 'invoice',
-                                'value'   => $value,
-                            ]);
-                        }
-                    }
+            /*
+            foreach ($new_jobreport_data['newitems'] as $key => $item) {
+                if ($new_item_added = add_new_jobreport_item_post($item, $id, 'jobreport')) {
+                    $affectedRows++;
                 }
             }
+            */
+
+            // Update schedule with the new jobreport data and set to status accepted
+            $this->db->where('id', $_schedule->id);
+            $this->db->update(db_prefix() . 'schedules', [
+                'jobreport_date' => date('Y-m-d H:i:s'),
+                'jobreportid'     => $id,
+                'status'        => 5,
+            ]);
+
 
             if ($client == false) {
                 $this->log_schedule_activity($_schedule->id, 'schedule_activity_converted', false, serialize([
-                    '<a href="' . admin_url('invoices/list_invoices/' . $id) . '">' . format_invoice_number($id) . '</a>',
+                    '<a href="' . admin_url('jobreports/jobreport/' . $id) . '">' . format_jobreport_number($id) . '</a>',
                 ]));
             }
 
-            hooks()->do_action('schedule_converted_to_invoice', ['invoice_id' => $id, 'schedule_id' => $_schedule->id]);
+            hooks()->do_action('schedule_converted_to_jobreport', ['jobreport_id' => $id, 'schedule_id' => $_schedule->id]);
         }
 
         return $id;
@@ -388,6 +343,7 @@ class Schedules_model extends App_Model
 
         return false;
     }
+    
 
     /**
      * Performs schedules totals status
@@ -479,16 +435,6 @@ class Schedules_model extends App_Model
 
         $save_and_send = isset($data['save_and_send']);
 
-        $scheduleRequestID = false;
-        if (isset($data['schedule_request_id'])) {
-            $scheduleRequestID = $data['schedule_request_id'];
-            unset($data['schedule_request_id']);
-        }
-
-        if (isset($data['custom_fields'])) {
-            $custom_fields = $data['custom_fields'];
-            unset($data['custom_fields']);
-        }
 
         $data['hash'] = app_generate_hash();
         $tags         = isset($data['tags']) ? $data['tags'] : '';
@@ -497,12 +443,6 @@ class Schedules_model extends App_Model
         if (isset($data['newitems'])) {
             $items = $data['newitems'];
             unset($data['newitems']);
-        }
-
-        $schedule_members = [];
-        if (isset($data['schedule_members'])) {
-            $schedule_members = $data['schedule_members'];
-            unset($data['schedule_members']);
         }
 
         $data = $this->map_shipping_columns($data);
@@ -518,16 +458,24 @@ class Schedules_model extends App_Model
         $hook = hooks()->apply_filters('before_schedule_added', [
             'data'  => $data,
             'items' => $items,
-            'schedule_members' => $schedule_members,
         ]);
 
         $data  = $hook['data'];
         $items = $hook['items'];
-        $schedule_members      = $hook['schedule_members'];
 
         unset($data['tags']);
-            
-        $this->db->insert(db_prefix() . 'schedules', $data);
+        unset($data['allowed_payment_modes']);
+        unset($data['save_as_draft']);
+        unset($data['schedule_id']);
+        unset($data['duedate']);
+
+        try {
+            $this->db->insert(db_prefix() . 'schedules', $data);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            log_activity('Insert ERROR ' . $message);
+        }
+
         $insert_id = $this->db->insert_id();
 
         if ($insert_id) {
@@ -536,33 +484,12 @@ class Schedules_model extends App_Model
             $this->db->set('value', 'value+1', false);
             $this->db->update(db_prefix() . 'options');
 
-            if ($scheduleRequestID !== false && $scheduleRequestID != '') {
-                $this->load->model('schedule_request_model');
-                $completedStatus = $this->schedule_request_model->get_status_by_flag('completed');
-                $this->schedule_request_model->update_request_status([
-                    'requestid' => $scheduleRequestID,
-                    'status'    => $completedStatus->id,
-                ]);
-            }
-
-            if (isset($custom_fields)) {
-                handle_custom_fields_post($insert_id, $custom_fields);
-            }
-
             handle_tags_save($tags, $insert_id, 'schedule');
 
             foreach ($items as $key => $item) {
                 if ($new_item_added = add_new_schedule_item_post($item, $insert_id, 'schedule')) {
                     $affectedRows++;
                 }
-            }
-
-            $_sm = [];
-            if (isset($schedule_members)) {
-                $_sm['schedule_members'] = $schedule_members;
-            }
-            if ($this->add_edit_schedule_members($_sm, $insert_id)) {
-                $affectedRows++;
             }
 
             hooks()->do_action('after_schedule_added', $insert_id);
@@ -624,12 +551,6 @@ class Schedules_model extends App_Model
             unset($data['newitems']);
         }
 
-        $schedule_members = [];
-        if (isset($data['schedule_members'])) {
-            $schedule_members = $data['schedule_members'];
-            unset($data['schedule_members']);
-        }
-
         if (isset($data['tags'])) {
             if (handle_tags_save($data['tags'], $id, 'schedule')) {
                 $affectedRows++;
@@ -655,15 +576,14 @@ class Schedules_model extends App_Model
         $data                  = $hook['data'];
         $items                 = $hook['items'];
         $newitems              = $hook['newitems'];
-        $schedule_members      = $hook['schedule_members'];
         $data['removed_items'] = $hook['removed_items'];
 
         // Delete items checked to be removed from database
         foreach ($data['removed_items'] as $remove_item_id) {
             $original_item = $this->get_schedule_item($remove_item_id);
-            if (handle_removed_sales_item_post($remove_item_id, 'schedule')) {
+            if (handle_removed_schedule_item_post($remove_item_id, 'schedule')) {
                 $affectedRows++;
-                $this->log_schedule_activity($id, 'invoice_schedule_activity_removed_item', false, serialize([
+                $this->log_schedule_activity($id, 'schedule_activity_removed_item', false, serialize([
                     $original_item->description,
                 ]));
             }
@@ -708,7 +628,7 @@ class Schedules_model extends App_Model
 
 
             if (update_schedule_item_post($item['itemid'], $item, 'qty')) {
-                $this->log_schedule_activity($id, 'invoice_schedule_activity_updated_qty_item', false, serialize([
+                $this->log_schedule_activity($id, 'schedule_activity_updated_qty_item', false, serialize([
                     $item['description'],
                     $original_item->qty,
                     $item['qty'],
@@ -717,7 +637,7 @@ class Schedules_model extends App_Model
             }
 
             if (update_schedule_item_post($item['itemid'], $item, 'description')) {
-                $this->log_schedule_activity($id, 'invoice_schedule_activity_updated_item_short_description', false, serialize([
+                $this->log_schedule_activity($id, 'schedule_activity_updated_item_short_description', false, serialize([
                     $original_item->description,
                     $item['description'],
                 ]));
@@ -725,7 +645,7 @@ class Schedules_model extends App_Model
             }
 
             if (update_schedule_item_post($item['itemid'], $item, 'long_description')) {
-                $this->log_schedule_activity($id, 'invoice_schedule_activity_updated_item_long_description', false, serialize([
+                $this->log_schedule_activity($id, 'schedule_activity_updated_item_long_description', false, serialize([
                     $original_item->long_description,
                     $item['long_description'],
                 ]));
@@ -740,23 +660,12 @@ class Schedules_model extends App_Model
             }
         }
 
-
-
-        $_sm = [];
-        if (isset($schedule_members)) {
-            $_sm['schedule_members'] = $schedule_members;
-        }
-        if ($this->add_edit_schedule_members($_sm, $id)) {
-            $affectedRows++;
-        }
-
         if ($save_and_send === true) {
             $this->send_schedule_to_client($id, '', true, '', true);
         }
 
         if ($affectedRows > 0) {
             hooks()->do_action('after_schedule_updated', $id);
-
             return true;
         }
 
@@ -788,19 +697,7 @@ class Schedules_model extends App_Model
                     : get_contact_user_id();
 
                 if ($action == 4) {
-                    if (get_option('schedule_auto_convert_to_invoice_on_client_accept') == 1) {
-                        $invoiceid = $this->convert_to_invoice($id, true);
-                        $this->load->model('invoices_model');
-                        if ($invoiceid) {
-                            $invoiced = true;
-                            $invoice  = $this->invoices_model->get($invoiceid);
-                            $this->log_schedule_activity($id, 'schedule_activity_client_accepted_and_converted', true, serialize([
-                                '<a href="' . admin_url('invoices/list_invoices/' . $invoiceid) . '">' . format_invoice_number($invoice->id) . '</a>',
-                            ]));
-                        }
-                    } else {
-                        $this->log_schedule_activity($id, 'schedule_activity_client_accepted', true);
-                    }
+                    $this->log_schedule_activity($id, 'schedule_activity_client_accepted', true);
 
                     // Send thank you email to all contacts with permission schedules
                     $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'project_emails' => 1]);
@@ -813,8 +710,8 @@ class Schedules_model extends App_Model
                         $notified = add_notification([
                             'fromcompany'     => true,
                             'touserid'        => $member['staffid'],
-                            'description'     => 'not_schedule_customer_accepted',
-                            'link'            => 'schedules/list_schedules/' . $id,
+                            'description'     => 'schedule_customer_accepted',
+                            'link'            => 'schedules/schedule/' . $id,
                             'additional_data' => serialize([
                                 format_schedule_number($schedule->id),
                             ]),
@@ -828,19 +725,16 @@ class Schedules_model extends App_Model
                     }
 
                     pusher_trigger_notification($notifiedUsers);
-                    hooks()->do_action('schedule_accepted', $id);
+                    hooks()->do_action('schedule_accepted', $schedule);
 
-                    return [
-                        'invoiced'  => $invoiced,
-                        'invoiceid' => $invoiceid,
-                    ];
+                    return true;
                 } elseif ($action == 3) {
                     foreach ($staff_schedule as $member) {
                         $notified = add_notification([
                             'fromcompany'     => true,
                             'touserid'        => $member['staffid'],
-                            'description'     => 'not_schedule_customer_declined',
-                            'link'            => 'schedules/list_schedules/' . $id,
+                            'description'     => 'schedule_customer_declined',
+                            'link'            => 'schedules/schedule/' . $id,
                             'additional_data' => serialize([
                                 format_schedule_number($schedule->id),
                             ]),
@@ -852,27 +746,48 @@ class Schedules_model extends App_Model
                         // Send staff email notification that customer declined schedule
                         // (To fix merge field) send_mail_template('schedule_declined_to_staff', 'schedules',$schedule, $member['email'], $contact_id);
                     }
-
                     pusher_trigger_notification($notifiedUsers);
                     $this->log_schedule_activity($id, 'schedule_activity_client_declined', true);
-                    hooks()->do_action('schedule_declined', $id);
+                    hooks()->do_action('schedule_declined', $schedule);
 
-                    return [
-                        'invoiced'  => $invoiced,
-                        'invoiceid' => $invoiceid,
-                    ];
+                    return true;
                 }
             } else {
                 if ($action == 2) {
                     $this->db->where('id', $id);
                     $this->db->update(db_prefix() . 'schedules', ['sent' => 1, 'datesend' => date('Y-m-d H:i:s')]);
-                }
-                // Admin marked schedule
-                $this->log_schedule_activity($id, 'schedule_activity_marked', false, serialize([
-                    '<status>' . $action . '</status>',
-                ]));
+                
+                    $this->db->where('active', 1);
+                    $staff_schedule = $this->db->get(db_prefix() . 'staff')->result_array();
+                    $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'project_emails' => 1]);
+                    
+                        foreach ($staff_schedule as $member) {
+                            $notified = add_notification([
+                                'fromcompany'     => true,
+                                'touserid'        => $member['staffid'],
+                                'description'     => 'schedule_send_to_customer_already_sent_2',
+                                'link'            => 'schedules/schedule/' . $id,
+                                'additional_data' => serialize([
+                                    format_schedule_number($schedule->id),
+                                ]),
+                            ]);
+                    
+                            if ($notified) {
+                                array_push($notifiedUsers, $member['staffid']);
+                            }
+                            // Send staff email notification that customer declined schedule
+                            // (To fix merge field) send_mail_template('schedule_declined_to_staff', 'schedules',$schedule, $member['email'], $contact_id);
+                        }
 
-                return true;
+                    // Admin marked schedule
+                    $this->log_schedule_activity($id, 'schedule_activity_marked', false, serialize([
+                        '<status>' . $action . '</status>',
+                    ]));
+                    pusher_trigger_notification($notifiedUsers);
+                    hooks()->do_action('schedule_send_to_customer_already_sent', $schedule);
+
+                    return true;
+                }
             }
         }
 
@@ -981,10 +896,7 @@ class Schedules_model extends App_Model
 
             delete_tracked_emails($id, 'schedule');
 
-            $this->db->where('relid IN (SELECT id from ' . db_prefix() . 'schedule_items WHERE rel_type="schedule" AND rel_id="' . $this->db->escape_str($id) . '")');
-            $this->db->where('fieldto', 'items');
-            $this->db->delete(db_prefix() . 'customfieldsvalues');
-
+            // Delete the items values
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'schedule');
             $this->db->delete(db_prefix() . 'notes');
@@ -1013,10 +925,11 @@ class Schedules_model extends App_Model
             $this->db->where('rel_type', 'schedule');
             $this->db->delete(db_prefix() . 'schedule_activity');
 
-            // Delete the custom field values
-            $this->db->where('relid', $id);
-            $this->db->where('fieldto', 'schedule');
-            $this->db->delete(db_prefix() . 'customfieldsvalues');
+            // Delete the items values
+            $this->db->where('rel_id', $id);
+            $this->db->where('rel_type', 'schedule');
+            $this->db->delete(db_prefix() . 'itemable');
+
 
             $attachments = $this->get_attachments($id);
             foreach ($attachments as $attachment) {
@@ -1025,7 +938,7 @@ class Schedules_model extends App_Model
 
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'schedule');
-            $this->db->delete('scheduled_emails');
+            $this->db->delete('schedule_emails');
 
             // Get related tasks
             $this->db->where('rel_type', 'schedule');
@@ -1056,7 +969,7 @@ class Schedules_model extends App_Model
             'datesend' => date('Y-m-d H:i:s'),
         ]);
 
-        $this->log_schedule_activity($id, 'invoice_schedule_activity_sent_to_client', false, serialize([
+        $this->log_schedule_activity($id, 'schedule_activity_sent_to_client', false, serialize([
             '<custom_data>' . implode(', ', $emails_sent) . '</custom_data>',
         ]));
 
@@ -1368,156 +1281,6 @@ class Schedules_model extends App_Model
         return $this->db->get(db_prefix() . 'schedule_members')->result_array();
     }
 
-    public function add_edit_schedule_members($data, $id)
-    {
-        $affectedRows = 0;
-        if (isset($data['schedule_members'])) {
-            $schedule_members = $data['schedule_members'];
-        }
-
-        $new_schedule_members_to_receive_email = [];
-        $this->db->select('id,number,clientid,project_id');
-        $this->db->where('id', $id);
-        $schedule      = $this->db->get(db_prefix() . 'schedules')->row();
-        $schedule_number = format_schedule_number($id);
-        $schedule_id    = $id;
-        $client_id    = $schedule->clientid;
-        $project_id    = $schedule->project_id;
-
-        $schedule_members_in = $this->get_schedule_members($id);
-        if (sizeof($schedule_members_in) > 0) {
-            foreach ($schedule_members_in as $schedule_member) {
-                if (isset($schedule_members)) {
-                    if (!in_array($schedule_member['staff_id'], $schedule_members)) {
-                        $this->db->where('schedule_id', $id);
-                        $this->db->where('staff_id', $schedule_member['staff_id']);
-                        $this->db->delete(db_prefix() . 'schedule_members');
-                        if ($this->db->affected_rows() > 0) {
-                            $this->db->where('staff_id', $schedule_member['staff_id']);
-                            $this->db->where('schedule_id', $id);
-                            $this->db->delete(db_prefix() . 'pinned_schedules');
-
-                            $this->log_schedule_activity($id, 'schedule_activity_removed_team_member', get_staff_full_name($schedule_member['staff_id']));
-                            $affectedRows++;
-                        }
-                    }
-                } else {
-                    $this->db->where('schedule_id', $id);
-                    $this->db->delete(db_prefix() . 'schedule_members');
-                    if ($this->db->affected_rows() > 0) {
-                        $affectedRows++;
-                    }
-                }
-            }
-            if (isset($schedule_members)) {
-                $notifiedUsers = [];
-                foreach ($schedule_members as $staff_id) {
-                    $this->db->where('schedule_id', $id);
-                    $this->db->where('staff_id', $staff_id);
-                    $_exists = $this->db->get(db_prefix() . 'schedule_members')->row();
-                    if (!$_exists) {
-                        if (empty($staff_id)) {
-                            continue;
-                        }
-                        $this->db->insert(db_prefix() . 'schedule_members', [
-                            'schedule_id' => $id,
-                            'staff_id'   => $staff_id,
-                        ]);
-                        if ($this->db->affected_rows() > 0) {
-                            if ($staff_id != get_staff_user_id()) {
-                                $notified = add_notification([
-                                    'fromuserid'      => get_staff_user_id(),
-                                    'description'     => 'not_staff_added_as_schedule_member',
-                                    'link'            => 'schedules/schedule/' . $id,
-                                    'touserid'        => $staff_id,
-                                    'additional_data' => serialize([
-                                        $schedule_number,
-                                    ]),
-                                ]);
-                                array_push($new_schedule_members_to_receive_email, $staff_id);
-                                if ($notified) {
-                                    array_push($notifiedUsers, $staff_id);
-                                }
-                            }
-
-                            $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
-                            $affectedRows++;
-                        }
-                    }
-                }
-                pusher_trigger_notification($notifiedUsers);
-            }
-        } else {
-            if (isset($schedule_members)) {
-                $notifiedUsers = [];
-                foreach ($schedule_members as $staff_id) {
-                    if (empty($staff_id)) {
-                        continue;
-                    }
-                    $this->db->insert(db_prefix() . 'schedule_members', [
-                        'schedule_id' => $id,
-                        'staff_id'   => $staff_id,
-                    ]);
-                    if ($this->db->affected_rows() > 0) {
-                        if ($staff_id != get_staff_user_id()) {
-                            $notified = add_notification([
-                                'fromuserid'      => get_staff_user_id(),
-                                'description'     => 'not_staff_added_as_schedule_member',
-                                'link'            => 'schedules/schedule/' . $id,
-                                'touserid'        => $staff_id,
-                                'additional_data' => serialize([
-                                    $schedule_number,
-                                ]),
-                            ]);
-                            array_push($new_schedule_members_to_receive_email, $staff_id);
-                            if ($notifiedUsers) {
-                                array_push($notifiedUsers, $staff_id);
-                            }
-                        }
-                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
-                        $affectedRows++;
-                    }
-                }
-                pusher_trigger_notification($notifiedUsers);
-            }
-        }
-
-        if (count($new_schedule_members_to_receive_email) > 0) {
-            $all_members = $this->get_schedule_members($id);
-            foreach ($all_members as $data) {
-                if (in_array($data['staff_id'], $new_schedule_members_to_receive_email)) {
-
-                try {
-                    // init bootstrapping phase
-                 
-                    //$send = // (To fix merge field) send_mail_template('schedule_staff_added_as_member', $data, $id, $client_id);
-                    $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
-                    $this->log_schedule_activity($id, 'schedule_activity_added_team_member', $client_id);
-                    $send = 1;
-                    if (!$send)
-                    {
-                      throw new Exception("Mail not send.");
-                    }
-                  
-                    // continue execution of the bootstrapping phase
-                } catch (Exception $e) {
-                    echo $e->getMessage();
-                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
-                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', $client_id);
-                }
-
-                }
-            }
-        }
-        if ($affectedRows > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-
 
     /**
      * Update canban schedule status when drag and drop
@@ -1596,19 +1359,18 @@ class Schedules_model extends App_Model
         $diff2 = date('Y-m-d', strtotime('+' . $days . ' days'));
 
         if ($staffId && ! staff_can('view', 'schedules', $staffId)) {
-            $this->db->where('addedfrom', $staffId);
+            $this->db->where(db_prefix() . 'schedules.addedfrom', $staffId);
         }
 
         $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'clients.company,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
         $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'schedules.clientid', 'left');
         $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
-        $this->db->where('expirydate IS NOT NULL');
-        $this->db->where('expirydate >=', $diff1);
-        $this->db->where('expirydate <=', $diff2);
+        $this->db->where('date IS NOT NULL');
+        $this->db->where('date >=', $diff1);
+        $this->db->where('date <=', $diff2);
 
         return $this->db->get(db_prefix() . 'schedules')->result_array();
     }
-
 
     /**
      * Get the schedules for the client given
@@ -1626,13 +1388,45 @@ class Schedules_model extends App_Model
         }
         */
 
-        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'schedules.hash,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
+        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'schedules.status,' . db_prefix() . 'clients.userid,' . db_prefix() . 'schedules.hash,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
         $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'schedules.clientid', 'left');
         $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
-        $this->db->where('expirydate IS NOT NULL');
+        $this->db->where('date IS NOT NULL');
+        $this->db->where(db_prefix() . 'schedules.status > ',1);
         $this->db->where(db_prefix() . 'schedules.clientid =', $client->userid);
 
         return $this->db->get(db_prefix() . 'schedules')->result_array();
     }
+
+
+    /**
+     * Get the schedules about to expired in the given days
+     *
+     * @param  integer|null $staffId
+     * @param  integer $days
+     *
+     * @return array
+     */
+    public function get_schedules_between($staffId = null, $days = 7)
+    {
+        $diff1 = date('Y-m-d', strtotime('-' . $days . ' days'));
+        $diff2 = date('Y-m-d', strtotime('+' . $days . ' days'));
+
+        if ($staffId && ! staff_can('view', 'schedules', $staffId)) {
+            $this->db->where('addedfrom', $staffId);
+        }
+
+        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'clients.company,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
+        $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'schedules.clientid', 'left');
+        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
+        $this->db->where('expirydate IS NOT NULL');
+        $this->db->where('expirydate >=', $diff1);
+        $this->db->where('expirydate <=', $diff2);
+
+        return $this->db->get_compiled_select(db_prefix() . 'schedules');
+//        return $this->db->get(db_prefix() . 'schedules')->get_compiled_select();
+//        return $this->db->get(db_prefix() . 'schedules')->result_array();
+    }
+
 
 }

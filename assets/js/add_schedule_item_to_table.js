@@ -181,7 +181,7 @@ function add_item_to_table(data, itemid, merge_invoice, bill_expense) {
         $('#item_select').selectpicker('val', '');
 
         if (cf_has_required && $('.invoice-form').length) {
-            validate_invoice_form();
+            validate_form();
         } else if (cf_has_required && $('.estimate-form').length) {
             validate_estimate_form();
         } else if (cf_has_required && $('.proposal-form').length) {

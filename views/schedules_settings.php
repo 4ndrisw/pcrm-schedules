@@ -3,43 +3,59 @@
 <div class="horizontal-scrollable-tabs mbot15">
    <div role="tabpanel" class="tab-pane" id="schedules">
       <div class="form-group">
-         <label class="control-label" for="schedule_prefix"><?php echo _l('settings_sales_schedule_prefix'); ?></label>
+         <label class="control-label" for="schedule_prefix"><?php echo _l('schedule_prefix'); ?></label>
          <input type="text" name="settings[schedule_prefix]" class="form-control" value="<?php echo get_option('schedule_prefix'); ?>">
       </div>
       <hr />
-      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('settings_sales_next_schedule_number_tooltip'); ?>"></i>
-      <?php echo render_input('settings[next_schedule_number]','settings_sales_next_schedule_number',get_option('next_schedule_number'), 'number', ['min'=>1]); ?>
+      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('next_schedule_number_tooltip'); ?>"></i>
+      <?php echo render_input('settings[next_schedule_number]','next_schedule_number',get_option('next_schedule_number'), 'number', ['min'=>1]); ?>
       <hr />
 
-      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('invoice_due_after_help'); ?>"></i>
+      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('due_after_help'); ?>"></i>
       <?php echo render_input('settings[schedule_due_after]','schedule_due_after',get_option('schedule_due_after')); ?>
       <hr />
-      <?php render_yes_no_option('delete_only_on_last_schedule','settings_delete_only_on_last_schedule'); ?>
+      <?php render_yes_no_option('delete_only_on_last_schedule','delete_only_on_last_schedule'); ?>
       <hr />
-      <?php render_yes_no_option('schedule_number_decrement_on_delete','settings_sales_decrement_schedule_number_on_delete','settings_sales_decrement_schedule_number_on_delete_tooltip'); ?>
+      <?php render_yes_no_option('schedule_number_decrement_on_delete','decrement_schedule_number_on_delete','decrement_schedule_number_on_delete_tooltip'); ?>
       <hr />
       <?php echo render_yes_no_option('allow_staff_view_schedules_assigned','allow_staff_view_schedules_assigned'); ?>
       <hr />
-
-      <?php render_yes_no_option('view_schedule_only_logged_in','settings_sales_require_client_logged_in_to_view_schedule'); ?>
+      <?php render_yes_no_option('view_schedule_only_logged_in','require_client_logged_in_to_view_schedule'); ?>
       <hr />
-      <?php render_yes_no_option('show_assigned_on_schedules','settings_show_assigned_on_schedules'); ?>
+      <?php render_yes_no_option('show_assigned_on_schedules','show_assigned_on_schedules'); ?>
       <hr />
       <?php render_yes_no_option('show_project_on_schedule','show_project_on_schedule'); ?>
       <hr />
-      <?php render_yes_no_option('schedule_auto_convert_to_invoice_on_client_accept','settings_schedule_auto_convert_to_invoice_on_client_accept'); ?>
+
+      <?php
+      $staff = $this->staff_model->get('', ['active' => 1]);
+      $selected = get_option('default_schedule_assigned');
+      foreach($staff as $member){
+       
+         if($selected == $member['staffid']) {
+           $selected = $member['staffid'];
+         
+       }
+      }
+      echo render_select('settings[default_schedule_assigned]',$staff,array('staffid',array('firstname','lastname')),'default_schedule_assigned_string',$selected);
+      ?>
       <hr />
-      <?php render_yes_no_option('exclude_schedule_from_client_area_with_draft_status','settings_exclude_schedule_from_client_area_with_draft_status'); ?>
+      <?php render_yes_no_option('exclude_schedule_from_client_area_with_draft_status','exclude_schedule_from_client_area_with_draft_status'); ?>
+      <hr />   
+      <?php render_yes_no_option('schedule_accept_identity_confirmation','schedule_accept_identity_confirmation'); ?>
       <hr />
+      <?php echo render_input('settings[schedule_year]','schedule_year',get_option('schedule_year'), 'number', ['min'=>2020]); ?>
+      <hr />
+      
       <div class="form-group">
-         <label for="schedule_number_format" class="control-label clearfix"><?php echo _l('settings_sales_schedule_number_format'); ?></label>
+         <label for="schedule_number_format" class="control-label clearfix"><?php echo _l('schedule_number_format'); ?></label>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="1" id="e_number_based" <?php if(get_option('schedule_number_format') == '1'){echo 'checked';} ?>>
-            <label for="e_number_based"><?php echo _l('settings_sales_schedule_number_format_number_based'); ?></label>
+            <label for="e_number_based"><?php echo _l('schedule_number_format_number_based'); ?></label>
          </div>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="2" id="e_year_based" <?php if(get_option('schedule_number_format') == '2'){echo 'checked';} ?>>
-            <label for="e_year_based"><?php echo _l('settings_sales_schedule_number_format_year_based'); ?> (YYYY.000001)</label>
+            <label for="e_year_based"><?php echo _l('schedule_number_format_year_based'); ?> (YYYY.000001)</label>
          </div>
          <div class="radio radio-primary radio-inline">
             <input type="radio" name="settings[schedule_number_format]" value="3" id="e_short_year_based" <?php if(get_option('schedule_number_format') == '3'){echo 'checked';} ?>>
@@ -79,8 +95,8 @@
          <div class="clearfix"></div>
       </div>
       <hr  />
-      <?php echo render_textarea('settings[predefined_clientnote_schedule]','settings_predefined_clientnote',get_option('predefined_clientnote_schedule'),array('rows'=>6)); ?>
-      <?php echo render_textarea('settings[predefined_terms_schedule]','settings_predefined_predefined_term',get_option('predefined_terms_schedule'),array('rows'=>6)); ?>
+      <?php echo render_textarea('settings[predefined_clientnote_schedule]','predefined_clientnote',get_option('predefined_clientnote_schedule'),array('rows'=>6)); ?>
+      <?php echo render_textarea('settings[predefined_terms_schedule]','predefined_terms',get_option('predefined_terms_schedule'),array('rows'=>6)); ?>
    </div>
- <?php hooks()->do_action('after_schedules_settings_tabs_content'); ?>
+ <?php hooks()->do_action('after_schedules_tabs_content'); ?>
 </div>

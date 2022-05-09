@@ -20,14 +20,14 @@
                                     echo '</div>';
                                 }
 							$selected = array();
-							$contacts = $this->clients_model->get_contacts($schedule->clientid,array('active'=>1,'schedule_emails'=>1));
+							$contacts = $this->clients_model->get_contacts($schedule->clientid,array('active'=>1,'project_emails'=>1));
 							foreach($contacts as $contact){
 								array_push($selected,$contact['id']);
 							}
 							 if(count($selected) == 0){
                                     echo '<p class="text-danger">' . _l('sending_email_contact_permissions_warning',_l('customer_permission_schedule')) . '</p><hr />';
                                 }
-							echo render_select('sent_to[]',$contacts,array('id','email','firstname,lastname'),'invoice_schedule_sent_to_email',$selected,array('multiple'=>true),array(),'','',false);
+							echo render_select('sent_to[]',$contacts,array('id','email','firstname,lastname'),'schedule_sent_to_email',$selected,array('multiple'=>true),array(),'','',false);
 							?>
 						</div>
 						<?php echo render_input('cc','CC'); ?>

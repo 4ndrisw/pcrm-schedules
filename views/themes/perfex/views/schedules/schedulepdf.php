@@ -31,25 +31,10 @@ $schedule_info .= '<div style="color:#424242;">';
 $schedule_info .= format_customer_info($schedule, 'schedule', 'billing');
 $schedule_info .= '</div>';
 
-// ship to to
-if ($schedule->include_shipping == 1 && $schedule->show_shipping_on_schedule == 1) {
-    $schedule_info .= '<br /><b>' . _l('ship_to') . '</b>';
-    $schedule_info .= '<div style="color:#424242;">';
-    $schedule_info .= format_customer_info($schedule, 'schedule', 'shipping');
-    $schedule_info .= '</div>';
-}
-
-
-$organization_info .= '<p><strong>'. _l('schedule_members_name') . '</strong></p>';
-
 $CI = &get_instance();
 $CI->load->model('schedules_model');
 $schedule_members = $CI->schedules_model->get_schedule_members($schedule->id,true);
-$i=1;
-foreach($schedule_members as $member){
-  $organization_info .=  $i.'. ' .$member['firstname'] .' '. $member['lastname']. '<br />';
-  $i++;
-}
+
 
 $schedule_info .= '<br />' . _l('schedule_data_date') . ': ' . _d($schedule->date) . '<br />';
 
@@ -81,16 +66,40 @@ $tblhtml = $items->table();
 
 $pdf->writeHTML($tblhtml, true, false, false, false, '');
 
-$pdf->Ln(2);
+$pdf->SetFont($font_name, '', $font_size);
+
+$assigned_path = <<<EOF
+        <img width="150" height="150" src="$schedule->assigned_path">
+    EOF;    
+$assigned_info = '<div style="text-align:center;">';
+    $assigned_info .= get_option('invoice_company_name') . '<br />';
+    $assigned_info .= $assigned_path . '<br />';
 
 if ($schedule->assigned != 0 && get_option('show_assigned_on_schedules') == 1) {
-    $pdf->Ln(2);
-    $pdf->SetFont($font_name, 'B', $font_size);
-    $pdf->Cell(0, 0, _l('schedule_staff_string') . ":", 0, 1, 'L', 0, '', 0);
-    $pdf->SetFont($font_name, '', $font_size);
-    $pdf->Ln(2);
-    $pdf->writeHTMLCell('', '', '', '', get_staff_full_name($schedule->assigned), 0, 1, false, true, 'L', true);
+    $assigned_info .= get_staff_full_name($schedule->assigned);
 }
+$assigned_info .= '</div>';
+
+$acceptance_path = <<<EOF
+    <img src="$schedule->acceptance_path">
+EOF;
+$client_info = '<div style="text-align:center;">';
+    $client_info .= $schedule->client_company .'<br />';
+
+if ($schedule->signed != 0) {
+    $client_info .= _l('schedule_signed_by') . ": {$schedule->acceptance_firstname} {$schedule->acceptance_lastname}" . '<br />';
+    $client_info .= _l('schedule_signed_date') . ': ' . _dt($schedule->acceptance_date_string) . '<br />';
+    $client_info .= _l('schedule_signed_ip') . ": {$schedule->acceptance_ip}" . '<br />';
+
+    $client_info .= $acceptance_path;
+    $client_info .= '<br />';
+}
+$client_info .= '</div>';
+
+
+$left_info  = $swap == '1' ? $client_info : $assigned_info;
+$right_info = $swap == '1' ? $assigned_info : $client_info;
+pdf_multi_row($left_info, $right_info, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
 
 if (!empty($schedule->clientnote)) {
     $pdf->Ln(4);

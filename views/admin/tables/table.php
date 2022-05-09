@@ -9,11 +9,11 @@ $statuses = $CI->schedules_model->get_statuses();
 
 $aColumns = [
     //'subject',
-    'number',
+    'formatted_number',
     db_prefix() . 'clients.company',
     'project_id',
-    'status',
     //db_prefix() . 'projects.name',
+    'status',
     db_prefix() . 'schedules.date',
     'acceptance_firstname',
     db_prefix() . 'schedules.acceptance_date',
@@ -48,8 +48,8 @@ foreach ($rResult as $aRow) {
     $row = [];
     for ($i = 0; $i < count($aColumns); $i++) {
         $_data = $aRow[$aColumns[$i]];
-        if ($aColumns[$i] == 'number') {
-            $_data = '<a href="' . admin_url('schedules/schedule/' . $aRow['id']) . '">' . format_schedule_number($aRow['id']) . '</a>';
+        if ($aColumns[$i] == 'formatted_number') {
+            $_data = '<a href="' . admin_url('schedules/schedule/' . $aRow['id']) . '">' . $_data . '</a>';
             $_data .= '<div class="row-options">';
             $_data .= '<a href="' . admin_url('schedules/update/' . $aRow['id']) . '">' . _l('edit') . '</a>';
 

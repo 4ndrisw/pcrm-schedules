@@ -15,11 +15,6 @@
                      </a>
                   </li>
                   <li role="presentation">
-                     <a href="#tab_tasks" onclick="init_rel_tasks_table(<?php echo $schedule->id; ?>,'schedule'); return false;" aria-controls="tab_tasks" role="tab" data-toggle="tab">
-                     <?php echo _l('tasks'); ?>
-                     </a>
-                  </li>
-                  <li role="presentation">
                      <a href="#tab_activity" aria-controls="tab_activity" role="tab" data-toggle="tab">
                      <?php echo _l('schedule_view_activity_tooltip'); ?>
                      </a>
@@ -86,8 +81,9 @@
                   <div class="mtop10"></div>
                </div>
                <div class="pull-right _buttons">
-                  <?php if(staff_can('edit', 'schedules')){ ?>
-                  <a href="<?php echo admin_url('schedules/update/'.$schedule->id); ?>" class="btn btn-default btn-with-tooltip" data-toggle="tooltip" title="<?php echo _l('edit_schedule_tooltip'); ?>" data-placement="bottom"><i class="fa fa-pencil-square-o"></i></a>
+                  <?php if((staff_can('edit', 'schedules') && $schedule->status != 4) || is_admin()){ ?>                     
+                     <a href="<?php echo admin_url('schedules/update/'.$schedule->id); ?>" class="btn btn-default btn-with-tooltip" data-toggle="tooltip" title="<?php echo _l('edit_schedule_tooltip'); ?>" data-placement="bottom"><i class="fa fa-pencil-square-o"></i></a>
+                  
                   <?php } ?>
                   <div class="btn-group">
                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf-o"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
@@ -114,7 +110,7 @@
                   <?php } ?>
                   <div class="btn-group">
                      <button type="button" class="btn btn-default pull-left dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                     <?php echo _l('more'); ?> <span class="caret"></span>
+                        <?php echo _l('more'); ?> <span class="caret"></span>
                      </button>
                      <ul class="dropdown-menu dropdown-menu-right">
                         <li>
@@ -131,7 +127,7 @@
                         </li>
                         <?php } ?>
                         <li>
-                           <a href="#" data-toggle="modal" data-target="#sales_attach_file"><?php echo _l('invoice_attach_file'); ?></a>
+                           <a href="#" data-toggle="modal" data-target="#sales_attach_file"><?php echo _l('attach_file'); ?></a>
                         </li>
                         <?php if (staff_can('create', 'projects') && $schedule->project_id == 0) { ?>
                            <li>
@@ -140,19 +136,19 @@
                               </a>
                            </li>
                         <?php } ?>
-                        <?php if($schedule->invoiceid == NULL){
+                           <?php
                            if(staff_can('edit', 'schedules')){
                              foreach($schedule_statuses as $status){
                                if($schedule->status != $status){ ?>
-                        <li>
-                           <a href="<?php echo admin_url() . 'schedules/mark_action_status/'.$status.'/'.$schedule->id; ?>">
-                           <?php echo _l('schedule_mark_as',format_schedule_status($status,'',false)); ?></a>
-                        </li>
-                        <?php }
-                           }
-                           ?>
-                        <?php } ?>
-                        <?php } ?>
+                                 <li>
+                                    <a href="<?php echo admin_url() . 'schedules/mark_action_status/'.$status.'/'.$schedule->id; ?>">
+                                    <?php echo _l('schedule_mark_as',format_schedule_status($status,'',false)); ?></a>
+                                 </li>
+                              <?php }
+                             }
+                             ?>
+                           <?php } ?>
+
                         <?php if(staff_can('create', 'schedules')){ ?>
                         <li>
                            <a href="<?php echo admin_url('schedules/copy/'.$schedule->id); ?>">
@@ -179,23 +175,28 @@
                            ?>
                      </ul>
                   </div>
-                  <?php if($schedule->invoiceid == NULL){ ?>
-                  <?php if(staff_can('create', 'invoices') && !empty($schedule->clientid)){ ?>
+
+
+                  <?php if($schedule->jobreportid == NULL){ ?>
+                  <?php if(staff_can('create', 'schedules') && !empty($schedule->clientid)){ ?>
                   <div class="btn-group pull-right mleft5">
                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                     <?php echo _l('schedule_convert_to_invoice'); ?> <span class="caret"></span>
+                     <?php echo _l('schedule_convert_to_jobreport'); ?> <span class="caret"></span>
                      </button>
                      <ul class="dropdown-menu">
-                        <li><a href="<?php echo admin_url('schedules/convert_to_invoice/'.$schedule->id.'?save_as_draft=true'); ?>"><?php echo _l('convert_and_save_as_draft'); ?></a></li>
+                        <li><a href="<?php echo admin_url('schedules/convert_to_jobreport/'.$schedule->id.'?save_as_draft=true'); ?>"><?php echo _l('convert_and_save_as_draft'); ?></a></li>
                         <li class="divider">
-                        <li><a href="<?php echo admin_url('schedules/convert_to_invoice/'.$schedule->id); ?>"><?php echo _l('convert'); ?></a></li>
+                        <li><a href="<?php echo admin_url('schedules/convert_to_jobreport/'.$schedule->id); ?>"><?php echo _l('convert'); ?></a></li>
                         </li>
                      </ul>
                   </div>
                   <?php } ?>
                   <?php } else { ?>
-                  <a href="<?php echo admin_url('invoices/list_invoices/'.$schedule->invoice->id); ?>" data-placement="bottom" data-toggle="tooltip" title="<?php echo _l('schedule_invoiced_date',_dt($schedule->invoiced_date)); ?>"class="btn mleft10 btn-info"><?php echo format_invoice_number($schedule->invoice->id); ?></a>
+                  <a href="<?php echo admin_url('jobreports/jobreport/'.$schedule->jobreportid); ?>" data-placement="bottom" data-toggle="tooltip" title="<?php echo _l('schedule_jobreportd_date',_dt($schedule->jobreport_date)); ?>"class="btn mleft10 btn-info"><?php echo format_jobreport_number($schedule->jobreportid); ?></a>
                   <?php } ?>
+
+
+
                </div>
             </div>
          </div>
@@ -205,7 +206,7 @@
             <div role="tabpanel" class="tab-pane ptop10 active" id="tab_schedule">
                <?php if(isset($schedule->scheduled_email) && $schedule->scheduled_email) { ?>
                      <div class="alert alert-warning">
-                        <?php echo _l('invoice_will_be_sent_at', _dt($schedule->scheduled_email->scheduled_at)); ?>
+                        <?php echo _l('will_be_sent_at', _dt($schedule->scheduled_email->scheduled_at)); ?>
                         <?php if(staff_can('edit', 'schedules') || $schedule->addedfrom == get_staff_user_id()) { ?>
                            <a href="#"
                            onclick="edit_schedule_scheduled_email(<?php echo $schedule->scheduled_email->id; ?>); return false;">
@@ -271,16 +272,7 @@
                   <div class="row">
                      <div class="container-fluid">
                         <div class="col-md-6">
-                           <?php if(!empty($schedule_members)){ ?>
-                              <strong><?= _l('schedule_members_name') ?></strong>
-                              <ul class="schedule_members">
-                              <?php 
-                                 foreach($schedule_members as $member){
-                                   echo ('<li style="list-style:auto" class="member">' . $member['firstname'] .' '. $member['lastname'] .'</li>');
-                                  }
-                              ?>
-                              </ul>
-                           <?php } ?>
+                           
                         </div>
                         <div class="col-md-6 text-right">
                            <p class="no-mbot">
@@ -289,12 +281,6 @@
                               </span>
                               <?php echo $schedule->date; ?>
                            </p>
-                           <?php if(!empty($schedule->expirydate)){ ?>
-                           <p class="no-mbot">
-                              <span class="bold"><?php echo _l('schedule_data_expiry_date'); ?>:</span>
-                              <?php echo $schedule->expirydate; ?>
-                           </p>
-                           <?php } ?>
                            <?php if(!empty($schedule->reference_no)){ ?>
                            <p class="no-mbot">
                               <span class="bold"><?php echo _l('reference_no'); ?>:</span>
@@ -308,20 +294,11 @@
                               <?php echo get_project_name_by_id($schedule->project_id); ?>
                            </p>
                            <?php } ?>
-                           <?php $pdf_custom_fields = get_custom_fields('schedule',array('show_on_pdf'=>1));
-                              foreach($pdf_custom_fields as $field){
-                              $value = get_custom_field_value($schedule->id,$field['id'],'schedule');
-                              if($value == ''){continue;} ?>
-                           <p class="no-mbot">
-                              <span class="bold"><?php echo $field['name']; ?>: </span>
-                              <?php echo $value; ?>
-                           </p>
-                           <?php } ?>
                         </div>
                      </div>
                   </div>
                   <div class="row">
-                     <div class="col-md-12">
+                     <div class="col-md-12 schedule-items">
                         <div class="table-responsive">
                               <?php
                                  $items = get_schedule_items_table_data($schedule, 'schedule', 'html', true);
@@ -387,9 +364,6 @@
                   </div>
                </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="tab_tasks">
-               <?php init_relation_tasks_table(array('data-new-rel-id'=>$schedule->id,'data-new-rel-type'=>'schedule')); ?>
-            </div>
             <div role="tabpanel" class="tab-pane" id="tab_reminders">
                <a href="#" data-toggle="modal" class="btn btn-info" data-target=".reminder-modal-schedule-<?php echo $schedule->id; ?>"><i class="fa fa-bell-o"></i> <?php echo _l('schedule_set_reminder_title'); ?></a>
                <hr />
@@ -439,6 +413,7 @@
                                  $additional_data = '';
                                  if(!empty($activity['additional_data'])){
                                   $additional_data = unserialize($activity['additional_data']);
+                                  
                                   $i = 0;
                                   foreach($additional_data as $data){
                                     if(strpos($data,'<original_status>') !== false){

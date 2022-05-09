@@ -11,12 +11,11 @@
 					$this->load->view('admin/schedules/schedule_small_table'); 
 				?>
 			</div>
-			<div class="col-md-6 no-padding">
+			<div class="col-md-6 no-padding schedule-preview">
 				<?php $this->load->view('admin/schedules/schedule_preview_template'); ?>
 			</div>
 		</div>
 	</div>
-</div>
 </div>
 <?php init_tail(); ?>
 
@@ -34,7 +33,7 @@
 
 <script>
     $(function(){
-        initDataTable('.table-schedules', window.location.href, [2], [2]);
+        initDataTable('.table-schedules', window.location.href, 'undefined', 'undefined','fnServerParams', [0, 'desc']);
     });
 </script>
 

@@ -15,16 +15,15 @@
                     <hr class="hr-panel-heading" />
                     <?php } ?>
                     <?php render_datatable(array(
-                        _l('schedule_subject'),
+                        _l('schedule_number'),
                         _l('schedule_company'),
                         _l('schedule_list_project'),
                         //_l('schedule_projects_name'),
                         _l('schedule_status'),
                         _l('schedule_start_date'),
-                        _l('schedule_acceptance_firstname'),
+                        _l('schedule_acceptance_name'),
                         _l('schedule_acceptance_date'),
                         //_l('schedule_end_date'),
-
                         ),'schedules'); ?>
                     </div>
                 </div>
@@ -36,7 +35,7 @@
 <script type="text/javascript" id="schedule-js" src="<?= base_url() ?>modules/schedules/assets/js/schedules.js?"></script>
 <script>
     $(function(){
-        initDataTable('.table-schedules', window.location.href, [3], [3]);
+        initDataTable('.table-schedules', window.location.href, 'undefined', 'undefined','fnServerParams', [0, 'desc']);
     });
 </script>
 </body>

@@ -12,25 +12,20 @@ class Myschedule extends ClientsController
     /* Get all schedules in case user go on index page */
     public function list($id = '')
     {
-        
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data(module_views_path('schedules', 'admin/tables/table'));
         }
         $contact_id = get_contact_user_id();
         $user_id = get_user_id_by_contact_id($contact_id);
         $client = $this->clients_model->get($user_id);
-        
         $data['schedules'] = $this->schedules_model->get_client_schedules($client);
-        $data['client'] = $client;
-        $data['schedule_statuses'] = $this->schedules_model->get_statuses();
         $data['scheduleid']            = $id;
         $data['title']                 = _l('schedules_tracking');
-        
+
         $data['bodyclass'] = 'schedules';
         $this->data($data);
         $this->view('themes/'. active_clients_theme() .'/views/schedules/schedules');
         $this->layout();
-
     }
 
     public function show($id, $hash)
@@ -53,12 +48,8 @@ class Myschedule extends ClientsController
 
                 $redURL   = $this->uri->uri_string();
                 $accepted = false;
-                if (is_array($success) && $success['invoiced'] == true) {
-                    $accepted = true;
-                    $invoice  = $this->invoices_model->get($success['invoiceid']);
-                    set_alert('success', _l('clients_schedule_invoiced_successfully'));
-                    $redURL = site_url('invoice/' . $invoice->id . '/' . $invoice->hash);
-                } elseif (is_array($success) && $success['invoiced'] == false || $success === true) {
+
+                if (is_array($success)) {
                     if ($action == 4) {
                         $accepted = true;
                         set_alert('success', _l('clients_schedule_accepted_not_invoiced'));
@@ -78,6 +69,8 @@ class Myschedule extends ClientsController
             redirect($redURL);
         }
         // Handle Schedule PDF generator
+
+        $schedule_number = format_schedule_number($schedule->id);
         if ($this->input->post('schedulepdf')) {
             try {
                 $pdf = schedule_pdf($schedule);
@@ -86,8 +79,8 @@ class Myschedule extends ClientsController
                 die;
             }
 
-            $schedule_number = format_schedule_number($schedule->id);
-            $companyname     = get_option('invoice_company_name');
+            //$schedule_number = format_schedule_number($schedule->id);
+            $companyname     = get_option('company_name');
             if ($companyname != '') {
                 $schedule_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
             }
@@ -103,18 +96,57 @@ class Myschedule extends ClientsController
 
         $this->app_scripts->theme('sticky-js', 'assets/plugins/sticky/sticky.js');
 
-        $data['title'] = format_schedule_number($schedule->id);
+
+        $data['title'] = $schedule_number;
         $this->disableNavigation();
         $this->disableSubMenu();
+
+        $data['schedule_number']              = $schedule_number;
         $data['hash']                          = $hash;
         $data['can_be_accepted']               = false;
-        $data['schedule']                      = hooks()->apply_filters('schedule_html_pdf_data', $schedule);
+        $data['schedule']                     = hooks()->apply_filters('schedule_html_pdf_data', $schedule);
         $data['bodyclass']                     = 'viewschedule';
+        $data['client_company']                = $this->clients_model->get($schedule->clientid)->company;
+
         $data['identity_confirmation_enabled'] = $identity_confirmation_enabled;
         if ($identity_confirmation_enabled == '1') {
             $data['bodyclass'] .= ' identity-confirmation';
         }
-        $data['schedule_members']  = $this->schedules_model->get_schedule_members($schedule->id,true);
+
+        $qrcode_data  = '';
+        $qrcode_data .= _l('schedule_number') . ' : ' . $schedule_number ."\r\n";
+        $qrcode_data .= _l('schedule_date') . ' : ' . $schedule->date ."\r\n";
+        $qrcode_data .= _l('schedule_datesend') . ' : ' . $schedule->datesend ."\r\n";
+        $qrcode_data .= _l('schedule_assigned_string') . ' : ' . get_staff_full_name($schedule->assigned) ."\r\n";
+        $qrcode_data .= _l('schedule_url') . ' : ' . site_url('schedules/show/'. $schedule->id .'/'.$schedule->hash) ."\r\n";
+
+
+        $schedule_path = get_upload_path_by_type('schedules') . $schedule->id . '/';
+        _maybe_create_upload_path('uploads/schedules');
+        _maybe_create_upload_path('uploads/schedules/'.$schedule_path);
+
+        $params['data'] = $qrcode_data;
+        $params['writer'] = 'png';
+        $params['setSize'] = 160;
+        $params['encoding'] = 'UTF-8';
+        $params['setMargin'] = 0;
+        $params['setForegroundColor'] = ['r'=>0,'g'=>0,'b'=>0];
+        $params['setBackgroundColor'] = ['r'=>255,'g'=>255,'b'=>255];
+
+        $params['crateLogo'] = true;
+        $params['logo'] = './uploads/company/favicon.png';
+        $params['setResizeToWidth'] = 60;
+
+        $params['crateLabel'] = false;
+        $params['label'] = $schedule_number;
+        $params['setTextColor'] = ['r'=>255,'g'=>0,'b'=>0];
+        $params['ErrorCorrectionLevel'] = 'hight';
+
+        $params['saveToFile'] = FCPATH.'uploads/schedules/'.$schedule_path .'assigned-'.$schedule_number.'.'.$params['writer'];
+
+        $this->load->library('endroid_qrcode');
+        $this->endroid_qrcode->generate($params);
+
         $this->data($data);
         //$this->view('schedulehtml');
         $this->view('themes/'. active_clients_theme() .'/views/schedules/schedulehtml');
