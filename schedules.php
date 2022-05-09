@@ -3,9 +3,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
-Module Name: Schedules
+Module Name: schedules
 Description: Default module for defining schedules
-Version: 1.0.2
+Version: 1.0.1
 Requires at least: 2.3.*
 */
 
@@ -21,6 +21,8 @@ hooks()->add_action('admin_init', 'schedules_permissions');
 hooks()->add_action('clients_init', 'schedules_clients_area_menu_items');
 
 hooks()->add_action('staff_member_deleted', 'schedules_staff_member_deleted');
+
+hooks()->add_action('after_schedule_updated', 'schedule_create_assigned_qrcode');
 
 hooks()->add_filter('migration_tables_to_replace_old_links', 'schedules_migration_tables_to_replace_old_links');
 hooks()->add_filter('global_search_result_query', 'schedules_global_search_result_query', 10, 3);
@@ -52,7 +54,7 @@ function schedules_staff_member_deleted($data)
 function schedules_global_search_result_output($output, $data)
 {
     if ($data['type'] == 'schedules') {
-        $output = '<a href="' . admin_url('schedules/schedule/' . $data['result']['id']) . '">' . format_schedule_number($data['result']['number']) . '</a>';
+        $output = '<a href="' . admin_url('schedules/schedule/' . $data['result']['id']) . '">' . format_schedule_number($data['result']['id']) . '</a>';
     }
 
     return $output;
@@ -62,11 +64,26 @@ function schedules_global_search_result_query($result, $q, $limit)
 {
     $CI = &get_instance();
     if (has_permission('schedules', '', 'view')) {
-        // Schedules
-        $CI->db->select()->from(db_prefix() . 'schedules')->like(db_prefix() . 'projects.name', $q)->or_like(db_prefix() . 'clients.company', $q)->limit($limit);
-        $CI->db->join(db_prefix() . 'projects',db_prefix() . 'schedules.project_id='.db_prefix() .'projects.id', 'left');
+
+        // schedules
+        $CI->db->select()
+           ->from(db_prefix() . 'schedules')
+           ->like(db_prefix() . 'schedules.formatted_number', $q)->limit($limit);
+        
+        $result[] = [
+                'result'         => $CI->db->get()->result_array(),
+                'type'           => 'schedules',
+                'search_heading' => _l('schedules'),
+            ];
+        
+        if(isset($result[0]['result'][0]['id'])){
+            return $result;
+        }
+
+        // schedules
+        $CI->db->select()->from(db_prefix() . 'schedules')->like(db_prefix() . 'clients.company', $q)->or_like(db_prefix() . 'schedules.formatted_number', $q)->limit($limit);
         $CI->db->join(db_prefix() . 'clients',db_prefix() . 'schedules.clientid='.db_prefix() .'clients.userid', 'left');
-        $CI->db->order_by(db_prefix() . 'projects.name', 'ASC');
+        $CI->db->order_by(db_prefix() . 'clients.company', 'ASC');
 
         $result[] = [
                 'result'         => $CI->db->get()->result_array(),
@@ -102,34 +119,6 @@ function schedules_permissions()
     register_staff_capabilities('schedules', $capabilities, _l('schedules'));
 }
 
-function schedules_notification()
-{
-    $CI = &get_instance();
-    $CI->load->model('schedules/schedules_model');
-    $schedules = $CI->schedules_model->get('', true);
-    foreach ($schedules as $schedule) {
-        $achievement = $CI->schedules_model->calculate_schedule_achievement($schedule['id']);
-
-        if ($achievement['percent'] >= 100) {
-            if (date('Y-m-d') >= $schedule['end_date']) {
-                if ($schedule['notify_when_achieve'] == 1) {
-                    $CI->schedules_model->notify_staff_members($schedule['id'], 'success', $achievement);
-                } else {
-                    $CI->schedules_model->mark_as_notified($schedule['id']);
-                }
-            }
-        } else {
-            // not yet achieved, check for end date
-            if (date('Y-m-d') > $schedule['end_date']) {
-                if ($schedule['notify_when_fail'] == 1) {
-                    $CI->schedules_model->notify_staff_members($schedule['id'], 'failed', $achievement);
-                } else {
-                    $CI->schedules_model->mark_as_notified($schedule['id']);
-                }
-            }
-        }
-    }
-}
 
 /**
 * Register activation module hook
@@ -141,6 +130,19 @@ function schedules_module_activation_hook()
     $CI = &get_instance();
     require_once(__DIR__ . '/install.php');
 }
+
+/**
+* Register deactivation module hook
+*/
+register_deactivation_hook(SCHEDULES_MODULE_NAME, 'schedules_module_deactivation_hook');
+
+function schedules_module_deactivation_hook()
+{
+
+     log_activity( 'Hello, world! . schedules_module_deactivation_hook ' );
+}
+
+//hooks()->add_action('deactivate_' . $module . '_module', $function);
 
 /**
 * Register language files, must be registered if the module is using languages
@@ -159,7 +161,7 @@ function schedules_module_init_menu_items()
             'name'       => _l('schedule'),
             'url'        => 'schedules',
             'permission' => 'schedules',
-            'position'   => 56,
+            'position'   => 57,
             ]);
 
     if (has_permission('schedules', '', 'view')) {
@@ -192,6 +194,26 @@ function schedules_clients_area_menu_items()
     }
 }
 
+/**
+ * [perfex_dark_theme_settings_tab net menu item in setup->settings]
+ * @return void
+ */
+function schedules_settings_tab()
+{
+    $CI = &get_instance();
+    $CI->app_tabs->add_settings_tab('schedules', [
+        'name'     => _l('settings_group_schedules'),
+        //'view'     => module_views_path(SCHEDULES_MODULE_NAME, 'admin/settings/includes/schedules'),
+        'view'     => 'schedules/schedules_settings',
+        'position' => 51,
+    ]);
+}
 
 $CI = &get_instance();
 $CI->load->helper(SCHEDULES_MODULE_NAME . '/schedules');
+
+if(($CI->uri->segment(0)=='admin' && $CI->uri->segment(1)=='schedules') || $CI->uri->segment(1)=='schedules'){
+    $CI->app_css->add(SCHEDULES_MODULE_NAME.'-css', base_url('modules/'.SCHEDULES_MODULE_NAME.'/assets/css/'.SCHEDULES_MODULE_NAME.'.css'));
+    $CI->app_scripts->add(SCHEDULES_MODULE_NAME.'-js', base_url('modules/'.SCHEDULES_MODULE_NAME.'/assets/js/'.SCHEDULES_MODULE_NAME.'.js'));
+}
+
