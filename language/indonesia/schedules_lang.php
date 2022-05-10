@@ -112,6 +112,8 @@ $lang['new_schedule']                = 'Buat SPD';
 $lang['schedule_assigned_string']                = 'Direktur';
 $lang['schedule_convert_to_jobreport']                = 'Ubah ke BAPP';
 $lang['schedule_convert_to_jobreport_successfully']   ='SPD berhasil diubah ke BAPP'; 
+$lang['schedule_data_expiry_date']                = 'Selesai';
+
 
 /*
 

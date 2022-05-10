@@ -114,6 +114,9 @@ $lang['schedule_list_date']                = 'Date';
 $lang['new_schedule']                = 'New schedule';
 $lang['schedule_convert_to_jobreport']                = 'Convert to BAPP';
 $lang['schedule_convert_to_jobreport_successfully']   ='Schedule convert to jobreport successfully';
+$lang['schedule_data_expiry_date']                = 'End date';
+
+
 /*
 
 # Job reports
