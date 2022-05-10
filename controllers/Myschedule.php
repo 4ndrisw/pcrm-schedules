@@ -112,6 +112,7 @@ class Myschedule extends ClientsController
         if ($identity_confirmation_enabled == '1') {
             $data['bodyclass'] .= ' identity-confirmation';
         }
+        $data['schedule_members']  = $this->schedules_model->get_schedule_members($schedule->id,true);
 
         $qrcode_data  = '';
         $qrcode_data .= _l('schedule_number') . ' : ' . $schedule_number ."\r\n";

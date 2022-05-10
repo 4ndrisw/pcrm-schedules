@@ -445,6 +445,12 @@ class Schedules_model extends App_Model
             unset($data['newitems']);
         }
 
+        $schedule_members = [];
+        if (isset($data['schedule_members'])) {
+            $schedule_members = $data['schedule_members'];
+            unset($data['schedule_members']);
+        }
+
         $data = $this->map_shipping_columns($data);
 
         $data['billing_street'] = trim($data['billing_street']);
@@ -551,6 +557,12 @@ class Schedules_model extends App_Model
             unset($data['newitems']);
         }
 
+        $schedule_members = [];
+        if (isset($data['schedule_members'])) {
+            $schedule_members = $data['schedule_members'];
+            unset($data['schedule_members']);
+        }
+        
         if (isset($data['tags'])) {
             if (handle_tags_save($data['tags'], $id, 'schedule')) {
                 $affectedRows++;
@@ -576,6 +588,7 @@ class Schedules_model extends App_Model
         $data                  = $hook['data'];
         $items                 = $hook['items'];
         $newitems              = $hook['newitems'];
+        $schedule_members      = $hook['schedule_members'];
         $data['removed_items'] = $hook['removed_items'];
 
         // Delete items checked to be removed from database
@@ -658,6 +671,14 @@ class Schedules_model extends App_Model
             if ($new_item_added = add_new_schedule_item_post($item, $id, 'schedule')) {
                 $affectedRows++;
             }
+        }
+
+        $_sm = [];
+        if (isset($schedule_members)) {
+            $_sm['schedule_members'] = $schedule_members;
+        }
+        if ($this->add_edit_schedule_members($_sm, $id)) {
+            $affectedRows++;
         }
 
         if ($save_and_send === true) {
@@ -1281,6 +1302,153 @@ class Schedules_model extends App_Model
         return $this->db->get(db_prefix() . 'schedule_members')->result_array();
     }
 
+    public function add_edit_schedule_members($data, $id)
+    {
+        $affectedRows = 0;
+        if (isset($data['schedule_members'])) {
+            $schedule_members = $data['schedule_members'];
+        }
+
+        $new_schedule_members_to_receive_email = [];
+        $this->db->select('id,number,clientid,project_id');
+        $this->db->where('id', $id);
+        $schedule      = $this->db->get(db_prefix() . 'schedules')->row();
+        $schedule_number = format_schedule_number($id);
+        $schedule_id    = $id;
+        $client_id    = $schedule->clientid;
+        $project_id    = $schedule->project_id;
+
+        $schedule_members_in = $this->get_schedule_members($id);
+        if (sizeof($schedule_members_in) > 0) {
+            foreach ($schedule_members_in as $schedule_member) {
+                if (isset($schedule_members)) {
+                    if (!in_array($schedule_member['staff_id'], $schedule_members)) {
+                        $this->db->where('schedule_id', $id);
+                        $this->db->where('staff_id', $schedule_member['staff_id']);
+                        $this->db->delete(db_prefix() . 'schedule_members');
+                        if ($this->db->affected_rows() > 0) {
+                            $this->db->where('staff_id', $schedule_member['staff_id']);
+                            $this->db->where('schedule_id', $id);
+                            $this->db->delete(db_prefix() . 'pinned_schedules');
+
+                            $this->log_schedule_activity($id, 'schedule_activity_removed_team_member', get_staff_full_name($schedule_member['staff_id']));
+                            $affectedRows++;
+                        }
+                    }
+                } else {
+                    $this->db->where('schedule_id', $id);
+                    $this->db->delete(db_prefix() . 'schedule_members');
+                    if ($this->db->affected_rows() > 0) {
+                        $affectedRows++;
+                    }
+                }
+            }
+            if (isset($schedule_members)) {
+                $notifiedUsers = [];
+                foreach ($schedule_members as $staff_id) {
+                    $this->db->where('schedule_id', $id);
+                    $this->db->where('staff_id', $staff_id);
+                    $_exists = $this->db->get(db_prefix() . 'schedule_members')->row();
+                    if (!$_exists) {
+                        if (empty($staff_id)) {
+                            continue;
+                        }
+                        $this->db->insert(db_prefix() . 'schedule_members', [
+                            'schedule_id' => $id,
+                            'staff_id'   => $staff_id,
+                        ]);
+                        if ($this->db->affected_rows() > 0) {
+                            if ($staff_id != get_staff_user_id()) {
+                                $notified = add_notification([
+                                    'fromuserid'      => get_staff_user_id(),
+                                    'description'     => 'not_staff_added_as_schedule_member',
+                                    'link'            => 'schedules/schedule/' . $id,
+                                    'touserid'        => $staff_id,
+                                    'additional_data' => serialize([
+                                        $schedule_number,
+                                    ]),
+                                ]);
+                                array_push($new_schedule_members_to_receive_email, $staff_id);
+                                if ($notified) {
+                                    array_push($notifiedUsers, $staff_id);
+                                }
+                            }
+
+                            $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
+                            $affectedRows++;
+                        }
+                    }
+                }
+                pusher_trigger_notification($notifiedUsers);
+            }
+        } else {
+            if (isset($schedule_members)) {
+                $notifiedUsers = [];
+                foreach ($schedule_members as $staff_id) {
+                    if (empty($staff_id)) {
+                        continue;
+                    }
+                    $this->db->insert(db_prefix() . 'schedule_members', [
+                        'schedule_id' => $id,
+                        'staff_id'   => $staff_id,
+                    ]);
+                    if ($this->db->affected_rows() > 0) {
+                        if ($staff_id != get_staff_user_id()) {
+                            $notified = add_notification([
+                                'fromuserid'      => get_staff_user_id(),
+                                'description'     => 'not_staff_added_as_schedule_member',
+                                'link'            => 'schedules/schedule/' . $id,
+                                'touserid'        => $staff_id,
+                                'additional_data' => serialize([
+                                    $schedule_number,
+                                ]),
+                            ]);
+                            array_push($new_schedule_members_to_receive_email, $staff_id);
+                            if ($notifiedUsers) {
+                                array_push($notifiedUsers, $staff_id);
+                            }
+                        }
+                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
+                        $affectedRows++;
+                    }
+                }
+                pusher_trigger_notification($notifiedUsers);
+            }
+        }
+
+        if (count($new_schedule_members_to_receive_email) > 0) {
+            $all_members = $this->get_schedule_members($id);
+            foreach ($all_members as $data) {
+                if (in_array($data['staff_id'], $new_schedule_members_to_receive_email)) {
+
+                try {
+                    // init bootstrapping phase
+                 
+                    //$send = // (To fix merge field) send_mail_template('schedule_staff_added_as_member', $data, $id, $client_id);
+                    $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
+                    $this->log_schedule_activity($id, 'schedule_activity_added_team_member', $client_id);
+                    $send = 1;
+                    if (!$send)
+                    {
+                      throw new Exception("Mail not send.");
+                    }
+                  
+                    // continue execution of the bootstrapping phase
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
+                        $this->log_schedule_activity($id, 'schedule_activity_added_team_member', $client_id);
+                }
+
+                }
+            }
+        }
+        if ($affectedRows > 0) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Update canban schedule status when drag and drop

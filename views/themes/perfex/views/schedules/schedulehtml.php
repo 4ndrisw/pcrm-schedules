@@ -105,7 +105,16 @@
          <div class="row">
             <div class="col-md-6">
                <div class="container-fluid">
-
+                  <?php if(!empty($schedule_members)){ ?>
+                     <strong><?= _l('schedule_members') ?></strong>
+                     <ul class="schedule_members">
+                     <?php 
+                        foreach($schedule_members as $member){
+                          echo ('<li style="list-style:auto" class="member">' . $member['firstname'] .' '. $member['lastname'] .'</li>');
+                         }
+                     ?>
+                     </ul>
+                  <?php } ?>
                </div>
             </div>
             <div class="col-md-6 text-right">

@@ -210,6 +210,20 @@
                   </div>
 
                   <div class="col-md-6">
+                    <?php
+                      $selected = array();
+                      if(isset($schedule_members)){
+                         foreach($schedule_members as $member){
+                            array_push($selected,$member['staff_id']);
+                         }
+                      } else {
+                         array_push($selected,get_staff_user_id());
+                      }
+                      echo render_select('schedule_members[]',$staff,array('staffid',array('firstname','lastname')),'schedule_members',$selected,array('multiple'=>true,'data-actions-box'=>true),array(),'','',false);
+                    ?>
+                  </div>
+                  
+                  <div class="col-md-6">
                     <?php $value = (isset($schedule) ? $schedule->reference_no : ''); ?>
                     <?php echo render_input('reference_no','reference_no',$value); ?>
                   </div>

@@ -31,10 +31,16 @@ $schedule_info .= '<div style="color:#424242;">';
 $schedule_info .= format_customer_info($schedule, 'schedule', 'billing');
 $schedule_info .= '</div>';
 
+$organization_info .= '<p><strong>'. _l('schedule_members') . '</strong></p>';
+
 $CI = &get_instance();
 $CI->load->model('schedules_model');
 $schedule_members = $CI->schedules_model->get_schedule_members($schedule->id,true);
-
+$i=1;
+foreach($schedule_members as $member){
+  $organization_info .=  $i.'. ' .$member['firstname'] .' '. $member['lastname']. '<br />';
+  $i++;
+}
 
 $schedule_info .= '<br />' . _l('schedule_data_date') . ': ' . _d($schedule->date) . '<br />';
 
