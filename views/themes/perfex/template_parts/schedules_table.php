@@ -12,7 +12,7 @@
     <tbody>
         <?php foreach($schedules as $schedule){ ?>
             <tr>
-                <td><?php echo '<a href="' . admin_url("schedules/schedule/" . $schedule["id"]) . '">' . format_schedule_number($schedule["id"]) . '</a>'; ?></td>
+                <td><?php echo '<a href="' . site_url("schedules/show/" . $schedule["id"] . '/' . $schedule["hash"]) . '">' . format_schedule_number($schedule["id"]) . '</a>'; ?></td>
                 <td><?php echo $schedule['name']; ?></td>
                 <td><?php echo _d($schedule['date']); ?></td>
                 <td><?php echo format_schedule_status($schedule['status']); ?></td>

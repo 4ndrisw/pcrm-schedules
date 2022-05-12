@@ -27,7 +27,7 @@ foreach ($rResult as $aRow) {
     for ($i = 0; $i < count($aColumns); $i++) {
         $_data = $aRow[$aColumns[$i]];
         if ($aColumns[$i] == 'formatted_number') {
-            $_data = '<a href="' . admin_url('schedules/schedule/' . $aRow['id']) . '">' . format_schedule_number($aRow['id']) . '</a>';
+            $_data = '<a href="' . admin_url('schedules/schedule/' . $aRow['id']) . '">' . $_data . '</a>';
             $_data .= '<div class="row-options">';
             $_data .= '<a href="' . admin_url('schedules/update/' . $aRow['id']) . '">' . _l('edit') . '</a>';
 

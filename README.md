@@ -1,2 +1,2 @@
 # pcrm-schedules
-PCRM Schedules
+PCRM schedules

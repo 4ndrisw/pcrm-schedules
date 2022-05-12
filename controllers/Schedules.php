@@ -153,7 +153,7 @@ class Schedules extends AdminController
     }
 
     /* update schedule */
-    public function update($id='')
+    public function update($id)
     {
         if ($this->input->post()) {
             $schedule_data = $this->input->post();
@@ -167,6 +167,21 @@ class Schedules extends AdminController
             if (!has_permission('schedules', '', 'edit')) {
                 access_denied('schedules');
             }
+            
+            $next_schedule_number = get_option('next_schedule_number');
+            $format = get_option('schedule_number_format');
+            $_prefix = get_option('schedule_prefix');
+            
+            $number_settings = $this->get_number_settings($id);
+
+            $prefix = isset($number_settings->prefix) ? $number_settings->prefix : $_prefix;
+            
+            $number  = isset($schedule_data['number']) ? $schedule_data['number'] : $next_schedule_number;
+
+            $date = date('Y-m-d');
+            
+            $schedule_data['formatted_number'] = schedule_number_format($number, $format, $prefix, $date);
+
             $success = $this->schedules_model->update($schedule_data, $id);
             if ($success) {
                 set_alert('success', _l('updated_successfully', _l('schedule')));
@@ -205,6 +220,12 @@ class Schedules extends AdminController
         $this->load->view('admin/schedules/schedule_update', $data);
     }
 
+    public function get_number_settings($id){
+        $this->db->select('prefix');
+        $this->db->where('id', $id);
+        return $this->db->get(db_prefix() . 'schedules')->row();
+
+    }
     public function update_number_settings($id)
     {
         $response = [
