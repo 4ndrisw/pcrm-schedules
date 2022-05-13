@@ -71,6 +71,7 @@ class Myschedule extends ClientsController
         // Handle Schedule PDF generator
 
         $schedule_number = format_schedule_number($schedule->id);
+        /*
         if ($this->input->post('schedulepdf')) {
             try {
                 $pdf = schedule_pdf($schedule);
@@ -90,12 +91,7 @@ class Myschedule extends ClientsController
             $pdf->Output($filename, 'D');
             die();
         }
-        $this->load->library('app_number_to_word', [
-            'clientid' => $schedule->clientid,
-        ], 'numberword');
-
-        $this->app_scripts->theme('sticky-js', 'assets/plugins/sticky/sticky.js');
-
+        */
 
         $data['title'] = $schedule_number;
         $this->disableNavigation();
@@ -149,7 +145,7 @@ class Myschedule extends ClientsController
         $this->endroid_qrcode->generate($params);
 
         $this->data($data);
-        //$this->view('schedulehtml');
+        $this->app_scripts->theme('sticky-js', 'assets/plugins/sticky/sticky.js');
         $this->view('themes/'. active_clients_theme() .'/views/schedules/schedulehtml');
         add_views_tracking('schedule', $id);
         hooks()->do_action('schedule_html_viewed', $id);
