@@ -14,7 +14,7 @@
       <div class="container preview-sticky-container">
          <div class="row">
             <div class="col-md-12">
-               <div class="col-md-2">
+               <div class="col-md-3">
                   <h3 class="bold no-mtop schedule-html-number no-mbot">
                      <span class="sticky-visible hide">
                      <?php echo format_schedule_number($schedule->id); ?>
