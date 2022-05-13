@@ -375,6 +375,25 @@ function user_can_view_schedule($id, $staff_id = false)
         return true;
     }
 
+    if(is_client_logged_in()){
+
+        $CI = &get_instance();
+        $CI->load->model('schedules_model');
+       
+        $schedule = $CI->schedules_model->get($id);
+        if (!$schedule) {
+            show_404();
+        }
+        // Do one more check
+        if (get_option('view_schedulet_only_logged_in') == 1) {
+            if ($schedule->clientid != get_client_user_id()) {
+                show_404();
+            }
+        }
+    
+        return true;
+    }
+    
     $CI->db->select('id, addedfrom, assigned');
     $CI->db->from(db_prefix() . 'schedules');
     $CI->db->where('id', $id);

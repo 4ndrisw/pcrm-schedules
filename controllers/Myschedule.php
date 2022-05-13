@@ -156,4 +156,56 @@ class Myschedule extends ClientsController
         no_index_customers_area();
         $this->layout();
     }
+    
+    /* Generates schedule PDF and senting to email  */
+    public function pdf($id)
+    {
+        $canView = user_can_view_schedule($id);
+        if (!$canView) {
+            access_denied('Schedules');
+        } else {
+            if (!has_permission('schedules', '', 'view') && !has_permission('schedules', '', 'view_own') && $canView == false) {
+                access_denied('Schedules');
+            }
+        }
+        if (!$id) {
+            redirect(admin_url('schedules'));
+        }
+        $schedule        = $this->schedules_model->get($id);
+        $schedule_number = format_schedule_number($schedule->id);
+        
+        $schedule->assigned_path = FCPATH . get_schedule_upload_path('schedule').$schedule->id.'/assigned-'.$schedule_number.'.png';
+        $schedule->acceptance_path = FCPATH . get_schedule_upload_path('schedule').$schedule->id.'/signature.png';
+        $schedule->client_company = $this->clients_model->get($schedule->clientid)->company;
+        $schedule->acceptance_date_string = _dt($schedule->acceptance_date);
+
+
+        try {
+            $pdf = schedule_pdf($schedule);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $type = 'D';
+
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        $fileNameHookData = hooks()->apply_filters('schedule_file_name_admin_area', [
+                            'file_name' => mb_strtoupper(slug_it($schedule_number)) . '.pdf',
+                            'schedule'  => $schedule,
+                        ]);
+
+        $pdf->Output($fileNameHookData['file_name'], $type);
+    }
 }
