@@ -172,7 +172,8 @@ class Myschedule extends ClientsController
         $schedule_number = format_schedule_number($schedule->id);
         
         $schedule->assigned_path = FCPATH . get_schedule_upload_path('schedule').$schedule->id.'/assigned-'.$schedule_number.'.png';
-        $schedule->acceptance_path = FCPATH . get_schedule_upload_path('schedule').$schedule->id.'/signature.png';
+        $schedule->acceptance_path = FCPATH . get_schedule_upload_path('schedule').$schedule->id .'/'.$schedule->signature;
+        
         $schedule->client_company = $this->clients_model->get($schedule->clientid)->company;
         $schedule->acceptance_date_string = _dt($schedule->acceptance_date);
 
