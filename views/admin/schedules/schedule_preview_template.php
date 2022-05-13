@@ -73,10 +73,10 @@
             </div>
          </div>
          <div class="row mtop10">
-            <div class="col-md-3">
+            <div class="col-md-3 no-padding">
                <?php echo format_schedule_status($schedule->status,'mtop5');  ?>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-9 no-padding">
                <div class="visible-xs">
                   <div class="mtop10"></div>
                </div>
