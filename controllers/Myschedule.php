@@ -103,6 +103,7 @@ class Myschedule extends ClientsController
         $data['schedule']                     = hooks()->apply_filters('schedule_html_pdf_data', $schedule);
         $data['bodyclass']                     = 'viewschedule';
         $data['client_company']                = $this->clients_model->get($schedule->clientid)->company;
+        $setSize = get_option('schedule_qrcode_size');
 
         $data['identity_confirmation_enabled'] = $identity_confirmation_enabled;
         if ($identity_confirmation_enabled == '1') {
@@ -124,7 +125,7 @@ class Myschedule extends ClientsController
 
         $params['data'] = $qrcode_data;
         $params['writer'] = 'png';
-        $params['setSize'] = 160;
+        $params['setSize'] = isset($setSize) ? $setSize : 160;
         $params['encoding'] = 'UTF-8';
         $params['setMargin'] = 0;
         $params['setForegroundColor'] = ['r'=>0,'g'=>0,'b'=>0];

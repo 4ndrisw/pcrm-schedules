@@ -117,6 +117,7 @@ $lang['schedule_convert_to_jobreport_successfully']   ='Schedule convert to jobr
 $lang['schedule_data_expiry_date']                = 'End date';
 $lang['schedule_members']                = 'Staff in charge';
 $lang['schedule_list_status']                = 'Status';
+$lang['schedule_qrcode_size']                = 'Schedule qrcode size';
 
 
 /*

@@ -10,7 +10,9 @@
       <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('next_schedule_number_tooltip'); ?>"></i>
       <?php echo render_input('settings[next_schedule_number]','next_schedule_number',get_option('next_schedule_number'), 'number', ['min'=>1]); ?>
       <hr />
-
+      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('due_after_help'); ?>"></i>
+      <?php echo render_input('settings[schedule_qrcode_size]', 'schedule_qrcode_size', get_option('schedule_qrcode_size')); ?>
+      <hr />
       <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('due_after_help'); ?>"></i>
       <?php echo render_input('settings[schedule_due_after]','schedule_due_after',get_option('schedule_due_after')); ?>
       <hr />

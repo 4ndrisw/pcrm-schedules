@@ -114,6 +114,7 @@ $lang['schedule_convert_to_jobreport_successfully']   ='SPD berhasil diubah ke B
 $lang['schedule_data_expiry_date']                = 'Selesai';
 $lang['schedule_members']                = 'Staf yg bertugas';
 $lang['schedule_list_status']                = 'Status';
+$lang['schedule_qrcode_size']                = 'Ukuran qrcode SPD';
 
 /*
 
