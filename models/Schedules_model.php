@@ -1523,7 +1523,7 @@ class Schedules_model extends App_Model
      */
     public function get_schedules_this_week($staffId = null, $days = 7)
     {
-        $diff1 = date('Y-m-d', strtotime('-' . $days . ' days'));
+        $diff1 = date('Y-m-d', strtotime('-' . 0 . ' days'));
         $diff2 = date('Y-m-d', strtotime('+' . $days . ' days'));
 
         if ($staffId && ! staff_can('view', 'schedules', $staffId)) {
