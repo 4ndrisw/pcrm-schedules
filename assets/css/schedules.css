@@ -4,3 +4,13 @@
 body #schedule-preview .schedule-items table tbody td.description span{
     color: #d1d3ea !important;
 }
+
+.customers.viewschedule #wrapper{
+    margin-left: 0;
+}
+
+@media (max-width: 1430px){
+    .customers.viewschedule .panel_s {
+        width: 100%;
+    }    
+}
