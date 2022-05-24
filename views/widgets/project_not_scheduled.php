@@ -14,17 +14,21 @@
             <?php if (!empty($schedules)) { ?>
                 <div class="table-vertical-scroll">
                     <a href="<?php echo admin_url('schedules'); ?>" class="mbot20 inline-block full-width"><?php echo _l('home_widget_view_all'); ?></a>
-                    <table id="widget-<?php echo create_widget_id(); ?>" class="table dt-table" data-order-col="3" data-order-type="desc">
+                    <table id="widget-<?php echo create_widget_id(); ?>" class="table dt-table" data-order-col="2" data-order-type="desc">
                         <thead>
                             <tr>
+                                <th>No.</th>
                                 <th class="<?php echo (isset($client) ? 'not_visible' : ''); ?>"><?php echo _l('schedule_list_project'); ?></th>
                                 <th><?php echo _l('schedule_list_client'); ?></th>
                                 <th><?php echo _l('schedule_list_date'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $i = 1; ?>
                             <?php foreach ($schedules as $schedule) { ?>
                                 <tr>
+                                    <td> <?php echo $i; ?>
+                                    </td>
                                     <td>
                                         <?php //echo $schedule['name']; ?>
                                         <?php echo '<a href="' . admin_url("projects/view/" . $schedule["id"]) . '">' . $schedule['name'] . '</a>'; ?>
@@ -36,6 +40,7 @@
                                         <?php echo _d($schedule['start_date']); ?>
                                     </td>
                                 </tr>
+                            <?php $i++; ?>
                             <?php } ?>
                         </tbody>
                     </table>
