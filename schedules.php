@@ -37,6 +37,10 @@ function schedules_add_dashboard_widget($widgets)
         'path'      => 'schedules/widgets/schedule_this_week',
         'container' => 'left-8',
     ];
+    $widgets[] = [
+        'path'      => 'schedules/widgets/project_not_scheduled',
+        'container' => 'left-8',
+    ];
 
     return $widgets;
 }

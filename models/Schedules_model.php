@@ -1540,6 +1540,36 @@ class Schedules_model extends App_Model
         return $this->db->get(db_prefix() . 'schedules')->result_array();
     }
 
+
+    /**
+     * Get the schedules about to expired in the given days
+     *
+     * @param  integer|null $staffId
+     * @param  integer $days
+     *
+     * @return array
+     */
+    public function get_project_not_scheduled($staffId = null, $days = 7)
+    {
+        $diff1 = date('Y-m-d', strtotime('-' . $days . ' days'));
+        $diff2 = date('Y-m-d', strtotime('+' . $days . ' days'));
+
+        if ($staffId && ! staff_can('view', 'schedules', $staffId)) {
+            $this->db->where(db_prefix() . 'schedules.addedfrom', $staffId);
+        }
+
+        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'clients.company,' . db_prefix() . 'projects.id,' . db_prefix() . 'projects.name,' . db_prefix() . 'projects.start_date');
+        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'right');
+        $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'projects.clientid', 'left');
+        
+        $this->db->where('project_id IS NULL');
+        $this->db->where(db_prefix() . 'projects.start_date >=', $diff1);
+        $this->db->where(db_prefix() . 'projects.start_date <=', $diff2);
+
+        return $this->db->get(db_prefix() . 'schedules')->result_array();
+    }
+
+
     /**
      * Get the schedules for the client given
      *

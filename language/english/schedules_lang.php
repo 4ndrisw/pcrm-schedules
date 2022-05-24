@@ -118,6 +118,7 @@ $lang['schedule_data_expiry_date']                = 'End date';
 $lang['schedule_members']                = 'Staff in charge';
 $lang['schedule_list_status']                = 'Status';
 $lang['schedule_qrcode_size']                = 'Schedule qrcode size';
+$lang['project_not_scheduled']                = 'Projects not scheduled yet';
 
 
 /*
