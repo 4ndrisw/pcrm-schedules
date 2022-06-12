@@ -24,13 +24,13 @@ $lang['require_client_logged_in_to_view_schedule']                          = 'R
 $lang['schedules']                          = 'Schedules';
 $lang['schedule_view_activity_tooltip']           = 'Activity Log';
 
-         
+
 $lang['schedule_status_draft']           = 'Draft';
 $lang['schedule_status_sent']            = 'Sent';
 $lang['schedule_status_declined']        = 'Declined';
 $lang['schedule_status_accepted']        = 'Accepted';
 $lang['schedule_status_expired']         = 'Expired';
-$lang['schedule_note']                   = 'Note:';   
+$lang['schedule_note']                   = 'Note:';
 
 $lang['schedules']                                = 'Schedules';
 $lang['schedule']                                 = 'Schedule';
@@ -119,6 +119,10 @@ $lang['schedule_members']                = 'Staff in charge';
 $lang['schedule_list_status']                = 'Status';
 $lang['schedule_qrcode_size']                = 'Schedule qrcode size';
 $lang['project_not_scheduled']                = 'Projects not scheduled yet';
+
+$lang['schedule_activity_added_team_member']                = 'Added team member to schedule';
+$lang['not_schedule_activity_status_updated']                = 'Schedule activity status updated';
+$lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
 
 
 /*

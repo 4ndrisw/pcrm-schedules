@@ -700,7 +700,7 @@ class Schedules_model extends App_Model
             'status' => $action,
             'signed' => ($action == 4) ? 1 : 0,
         ]);
-
+        log_activity('mark_action_status ' . $action);
         $notifiedUsers = [];
 
         if ($this->db->affected_rows() > 0) {

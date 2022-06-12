@@ -81,9 +81,9 @@
                   <div class="mtop10"></div>
                </div>
                <div class="pull-right _buttons">
-                  <?php if((staff_can('edit', 'schedules') && $schedule->status != 4) || is_admin()){ ?>                     
+                  <?php if((staff_can('edit', 'schedules') && $schedule->status != 4) || is_admin()){ ?>
                      <a href="<?php echo admin_url('schedules/update/'.$schedule->id); ?>" class="btn btn-default btn-with-tooltip" data-toggle="tooltip" title="<?php echo _l('edit_schedule_tooltip'); ?>" data-placement="bottom"><i class="fa fa-pencil-square-o"></i></a>
-                  
+
                   <?php } ?>
                   <div class="btn-group">
                      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf-o"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
@@ -275,7 +275,7 @@
                            <?php if(!empty($schedule_members)){ ?>
                               <strong><?= _l('schedule_members') ?></strong>
                               <ul class="schedule_members">
-                              <?php 
+                              <?php
                                  foreach($schedule_members as $member){
                                    echo ('<li style="list-style:auto" class="member">' . $member['firstname'] .' '. $member['lastname'] .'</li>');
                                   }
@@ -357,7 +357,7 @@
                         <div class="bold"><?php echo _l('schedule_staff_string'); ?>:</div>
                         <?php echo get_staff_full_name($schedule->assigned); ?>
                      </div>
-                     <?php } ?>                     
+                     <?php } ?>
                      <?php if($schedule->clientnote != ''){ ?>
                      <div class="col-md-12 mtop15">
                         <p class="bold text-muted"><?php echo _l('schedule_order'); ?></p>
@@ -422,7 +422,7 @@
                                  $additional_data = '';
                                  if(!empty($activity['additional_data'])){
                                   $additional_data = unserialize($activity['additional_data']);
-                                  
+
                                   $i = 0;
                                   foreach($additional_data as $data){
                                     if(strpos($data,'<original_status>') !== false){
@@ -480,4 +480,4 @@
       </div>
    </div>
 </div>
-<?php $this->load->view('admin/schedules/schedule_send_to_client'); ?>
+<?php //$this->load->view('admin/schedules/schedule_send_to_client'); ?>
