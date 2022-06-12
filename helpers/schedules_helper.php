@@ -6,6 +6,39 @@ hooks()->add_action('app_admin_head', 'schedules_head_component');
 //hooks()->add_action('app_admin_footer', 'schedules_footer_js__component');
 hooks()->add_action('admin_init', 'schedules_settings_tab');
 
+
+function schedules_notification()
+{
+    $CI = &get_instance();
+    $CI->load->model('schedules/schedules_model');
+    $schedules = $CI->schedules_model->get('', true);
+    /*
+    foreach ($schedules as $goal) {
+        $achievement = $CI->schedules_model->calculate_goal_achievement($goal['id']);
+
+        if ($achievement['percent'] >= 100) {
+            if (date('Y-m-d') >= $goal['end_date']) {
+                if ($goal['notify_when_achieve'] == 1) {
+                    $CI->schedules_model->notify_staff_members($goal['id'], 'success', $achievement);
+                } else {
+                    $CI->schedules_model->mark_as_notified($goal['id']);
+                }
+            }
+        } else {
+            // not yet achieved, check for end date
+            if (date('Y-m-d') > $goal['end_date']) {
+                if ($goal['notify_when_fail'] == 1) {
+                    $CI->schedules_model->notify_staff_members($goal['id'], 'failed', $achievement);
+                } else {
+                    $CI->schedules_model->mark_as_notified($goal['id']);
+                }
+            }
+        }
+    }
+    */
+}
+
+
 /**
  * Get Schedule short_url
  * @since  Version 2.7.3

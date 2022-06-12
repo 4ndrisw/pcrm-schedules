@@ -135,6 +135,17 @@ function schedule_mark_as(status_id, schedule_id) {
     data.status = status_id;
     data.scheduleid = schedule_id;
     $.post(admin_url + 'schedules/update_schedule_status', data).done(function (response) {
-        table_schedules.DataTable().ajax.reload(null, false);
+        //table_schedules.DataTable().ajax.reload(null, false);
+        reload_schedules_tables();
+    });
+}
+
+// Reload all schedules possible table where the table data needs to be refreshed after an action is performed on task.
+function reload_schedules_tables() {
+    var av_schedules_tables = ['.table-schedules', '.table-rel-schedules'];
+    $.each(av_schedules_tables, function (i, selector) {
+        if ($.fn.DataTable.isDataTable(selector)) {
+            $(selector).DataTable().ajax.reload(null, false);
+        }
     });
 }
