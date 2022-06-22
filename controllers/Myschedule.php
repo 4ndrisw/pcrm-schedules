@@ -115,7 +115,7 @@ class Myschedule extends ClientsController
         $qrcode_data .= _l('schedule_number') . ' : ' . $schedule_number ."\r\n";
         $qrcode_data .= _l('schedule_date') . ' : ' . $schedule->date ."\r\n";
         $qrcode_data .= _l('schedule_datesend') . ' : ' . $schedule->datesend ."\r\n";
-        $qrcode_data .= _l('schedule_assigned_string') . ' : ' . get_staff_full_name($schedule->assigned) ."\r\n";
+        //$qrcode_data .= _l('schedule_assigned_string') . ' : ' . get_staff_full_name($schedule->assigned) ."\r\n";
         //$qrcode_data .= _l('schedule_url') . ' : ' . site_url('schedules/show/'. $schedule->id .'/'.$schedule->hash) ."\r\n";
 
 
