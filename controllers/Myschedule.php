@@ -111,7 +111,7 @@ class Myschedule extends ClientsController
         }
         $data['schedule_members']  = $this->schedules_model->get_schedule_members($schedule->id,true);
 
-        $qrcode_data  = '';
+        $qrcode_data  = 'PT. Cipta Mas Jaya'."\r\n";
         $qrcode_data .= _l('schedule_number') . ' : ' . $schedule_number ."\r\n";
         $qrcode_data .= _l('schedule_date') . ' : ' . $schedule->date ."\r\n";
         $qrcode_data .= _l('schedule_datesend') . ' : ' . $schedule->datesend ."\r\n";
