@@ -105,7 +105,7 @@ $lang['clients_my_schedules']                   = 'Schedules';
 
 $lang['schedule_this_week']                = 'Schedules this week';
 $lang['schedule_date']                = 'Date';
-$lang['schedule_datesend']                = 'Sent date';
+$lang['schedule_datesend']                = 'Sent';
 $lang['schedule_assigned_string']                = 'Submitted by';
 $lang['schedule_url']                = 'long_url';
 $lang['schedule_send_to_customer_already_sent']                = 'Schedule already sent to customer_';
