@@ -65,11 +65,7 @@ $lang['schedule_mark_as']                = 'Mark as %s';
 $lang['schedule_staff_string']           = 'Operation Manager';
 $lang['schedule_note']                   = 'Note:';
 $lang['schedule_order']                  = 'To order the staff for';
-$lang['schedule_status_draft']           = 'Draft';
-$lang['schedule_status_sent']            = 'Sent';
-$lang['schedule_status_declined']        = 'Declined';
-$lang['schedule_status_accepted']        = 'Accepted';
-$lang['schedule_status_expired']         = 'Expired';
+
 $lang['schedule_set_reminder_title']             = 'Set Schedule Reminder';
 $lang['schedule_invoiced_date']                   = 'Schedule BAPP on %s';
 $lang['edit_schedule_tooltip']                    = 'Edit schedule';

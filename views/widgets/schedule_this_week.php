@@ -3,6 +3,7 @@
     $CI = &get_instance();
     $CI->load->model('schedules/schedules_model');
     $schedules = $CI->schedules_model->get_schedules_this_week(get_staff_user_id());
+
 ?>
 
 <div class="widget" id="widget-<?php echo create_widget_id(); ?>" data-name="<?php echo _l('schedule_this_week'); ?>">
@@ -25,7 +26,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($schedules as $schedule) { ?>
-                                <tr>
+                                <tr class="<?= 'schedule_status_' . $schedule['status']?>">
                                     <td>
                                         <?php echo '<a href="' . admin_url("schedules/schedule/" . $schedule["id"]) . '">' . format_schedule_number($schedule["id"]) . '</a>'; ?>
                                     </td>
@@ -33,7 +34,7 @@
                                         <?php echo '<a href="' . admin_url("clients/client/" . $schedule["userid"]) . '">' . $schedule["company"] . '</a>'; ?>
                                     </td>
                                     <td>
-                                        <?php echo $schedule['name']; ?>
+                                        <?php echo '<a href="' . admin_url("projects/view/" . $schedule["projects_id"]) . '">' . $schedule['name'] . '</a>'; ?>
                                     </td>
                                     <td>
                                         <?php echo _d($schedule['date']); ?>

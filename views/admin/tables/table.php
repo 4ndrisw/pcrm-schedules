@@ -34,6 +34,7 @@ $where  = [];
 
 $additionalColumns = hooks()->apply_filters('schedules_table_additional_columns_sql', [
     'id',
+    'status',
     'acceptance_lastname',
 ]);
 
@@ -115,6 +116,6 @@ foreach ($rResult as $aRow) {
 
         $row[] = $_data;
     }
-    $row['DT_RowClass'] = 'has-row-options';
+    $row['DT_RowClass'] = 'has-row-options-' .$aRow['status'];
     $output['aaData'][] = $row;
 }

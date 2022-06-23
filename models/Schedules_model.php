@@ -1530,12 +1530,14 @@ class Schedules_model extends App_Model
             $this->db->where(db_prefix() . 'schedules.addedfrom', $staffId);
         }
 
-        $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'clients.company,' . db_prefix() . 'projects.name,' . db_prefix() . 'schedules.date');
+        $this->db->select([db_prefix() . 'schedules.id', db_prefix() . 'schedules.number', db_prefix() . 'clients.userid', db_prefix() . 'clients.company', db_prefix() . 'projects.id projects_id', db_prefix() . 'projects.name', db_prefix() . 'schedules.date', db_prefix() . 'schedules.status']);
         $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'schedules.clientid', 'left');
         $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
         $this->db->where('date IS NOT NULL');
         $this->db->where('date >=', $diff1);
         $this->db->where('date <=', $diff2);
+
+        //return $this->db->get_compiled_select(db_prefix() . 'schedules');
 
         return $this->db->get(db_prefix() . 'schedules')->result_array();
     }
