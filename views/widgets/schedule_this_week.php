@@ -15,7 +15,7 @@
             <?php if (!empty($schedules)) { ?>
                 <div class="table-vertical-scroll">
                     <a href="<?php echo admin_url('schedules'); ?>" class="mbot20 inline-block full-width"><?php echo _l('home_widget_view_all'); ?></a>
-                    <table id="widget-<?php echo create_widget_id(); ?>" class="table dt-table" data-order-col="3" data-order-type="desc">
+                    <table id="widget-<?php echo create_widget_id(); ?>" class="table dt-table dt-inline dataTable no-footer" data-order-col="3" data-order-type="desc">
                         <thead>
                             <tr>
                                 <th><?php echo _l('schedule_number'); ?> #</th>

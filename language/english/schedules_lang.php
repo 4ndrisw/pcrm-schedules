@@ -119,6 +119,8 @@ $lang['project_not_scheduled']                = 'Projects not scheduled yet';
 $lang['schedule_activity_added_team_member']                = 'Added team member to schedule';
 $lang['not_schedule_activity_status_updated']                = 'Schedule activity status updated';
 $lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
+$lang['send_telegram_message']                = 'Send telegram message';
+
 
 
 /*
