@@ -116,7 +116,7 @@ $lang['schedule_members']                = 'Staf yg bertugas';
 $lang['schedule_list_status']                = 'Status';
 $lang['schedule_qrcode_size']                = 'Ukuran qrcode SPD';
 $lang['project_not_scheduled']                = 'Proyek yang belum dijadwalkan';
-$lang['send_telegram_message']                = 'Kirim pesan telegram';
+$lang['schedule_send_telegram_message']                = 'Kirim pesan telegram';
 
 /*
 

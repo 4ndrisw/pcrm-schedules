@@ -188,6 +188,8 @@ class Schedules_model extends App_Model
 
         $custom_fields_items                       = get_custom_fields('items');
         $key                                       = 1;
+
+        /*
         foreach ($_schedule->items as $item) {
             $new_jobreport_data['newitems'][$key]['description']      = $item['description'];
             $new_jobreport_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
@@ -196,6 +198,7 @@ class Schedules_model extends App_Model
             $new_jobreport_data['newitems'][$key]['order'] = $item['item_order'];
             $key++;
         }
+        */
 
         include_once(FCPATH . 'modules/jobreports/models/Jobreports_model.php');
 
@@ -243,7 +246,7 @@ class Schedules_model extends App_Model
                 ]));
             }
 
-            hooks()->do_action('schedule_converted_to_jobreport', ['jobreport_id' => $id, 'schedule_id' => $_schedule->id]);
+            hooks()->do_action('schedule_converted_to_jobreport', ['jobreport_id' => $id, 'schedule_id' => $_schedule->id, 'project_id' => $_schedule->project_id]);
         }
 
         return $id;

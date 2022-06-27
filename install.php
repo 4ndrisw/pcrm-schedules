@@ -167,7 +167,7 @@ add_option('schedules_pipeline_limit', 1);
 add_option('default_schedules_pipeline_sort', 1);
 add_option('schedule_accept_identity_confirmation', 1);
 add_option('schedule_qrcode_size', '160');
-add_option('send_telegram_message', 0);
+add_option('schedule_send_telegram_message', 0);
 
 
 /*
