@@ -15,7 +15,7 @@ $aColumns = [
     //db_prefix() . 'projects.name',
     'status',
     db_prefix() . 'schedules.date',
-    'acceptance_firstname',
+    //'acceptance_firstname',
     db_prefix() . 'schedules.acceptance_date',
 ];
 
