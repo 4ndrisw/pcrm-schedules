@@ -120,6 +120,10 @@ $lang['schedule_activity_added_team_member']                = 'Added team member
 $lang['not_schedule_activity_status_updated']                = 'Schedule activity status updated';
 $lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
 $lang['schedule_send_telegram_message']                = 'Send telegram message';
+$lang['not_staff_added_as_schedule_member']                = 'Staff added as schedule member';
+$lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
+$lang['schedules_tracking']                = 'Schedules tracking';
+$lang['schedule_activity_added_team_member']                = 'Added team member';
 
 
 

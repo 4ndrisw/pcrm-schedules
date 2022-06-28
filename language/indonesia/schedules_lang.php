@@ -117,6 +117,12 @@ $lang['schedule_list_status']                = 'Status';
 $lang['schedule_qrcode_size']                = 'Ukuran qrcode SPD';
 $lang['project_not_scheduled']                = 'Proyek yang belum dijadwalkan';
 $lang['schedule_send_telegram_message']                = 'Kirim pesan telegram';
+$lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
+$lang['schedules_tracking']                = 'Daftar schedule';
+$lang['schedule_activity_added_team_member']                = 'Staff ditambahkan pada Surat Jalan';
+
+
+
 
 /*
 
