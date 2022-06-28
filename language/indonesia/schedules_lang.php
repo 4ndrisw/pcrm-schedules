@@ -120,6 +120,7 @@ $lang['schedule_send_telegram_message']                = 'Kirim pesan telegram';
 $lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
 $lang['schedules_tracking']                = 'Daftar schedule';
 $lang['schedule_activity_added_team_member']                = 'Staff ditambahkan pada Surat Jalan';
+$lang['schedule_already_send_to_client_tooltip'] 					= 'SPD ini telah dikirim kepada klien %s';
 
 
 
@@ -164,7 +165,6 @@ $lang['schedule_invoiced_date']                  					= 'SPD telah diberi Faktur
 $lang['edit_schedule_tooltip']                   					= 'Edit SPD';
 $lang['delete_schedule_tooltip']                 					= 'Hapus SPD';
 $lang['schedule_sent_to_email_tooltip']          					= 'Kirim ke Email';
-$lang['schedule_already_send_to_client_tooltip'] 					= 'SPD ini telah dikirim kepada klien %s';
 $lang['schedule_view_activity_tooltip']          					= 'Aktivitas Log';
 $lang['schedule_send_to_client_modal_heading']    					= 'Kirim SPD ke Klien';
 $lang['schedule_send_to_client_attach_pdf']       					= 'Lampirkan SPD dalam format PDF';
