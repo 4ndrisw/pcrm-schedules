@@ -121,6 +121,7 @@ $lang['schedule_send_to_customer_already_sent_2']                = 'Schedule sen
 $lang['schedules_tracking']                = 'Daftar schedule';
 $lang['schedule_activity_added_team_member']                = 'Staff ditambahkan pada Surat Jalan';
 $lang['schedule_already_send_to_client_tooltip'] 					= 'SPD ini telah dikirim kepada klien %s';
+$lang['no_project_not_scheduled']                = 'Tidak ada project yang belum dijadwalkan';
 
 
 

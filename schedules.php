@@ -22,8 +22,6 @@ hooks()->add_action('clients_init', 'schedules_clients_area_menu_items');
 
 hooks()->add_action('staff_member_deleted', 'schedules_staff_member_deleted');
 
-hooks()->add_action('after_schedule_updated', 'schedule_create_assigned_qrcode');
-
 hooks()->add_filter('migration_tables_to_replace_old_links', 'schedules_migration_tables_to_replace_old_links');
 hooks()->add_filter('global_search_result_query', 'schedules_global_search_result_query', 10, 3);
 hooks()->add_filter('global_search_result_output', 'schedules_global_search_result_output', 10, 2);

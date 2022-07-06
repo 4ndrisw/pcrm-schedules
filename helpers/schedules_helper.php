@@ -737,15 +737,3 @@ function after_schedule_updated($id){
 
 
 }
-
-function schedule_create_assigned_qrcode_hook($id){
-     
-     log_activity( 'Hello, world!' );
-
-}
-
-function schedule_status_changed_hook($data){
-
-    log_activity('schedule_status_changed');
-
-}
