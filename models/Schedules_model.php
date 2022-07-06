@@ -501,11 +501,20 @@ class Schedules_model extends App_Model
                 }
             }
 
+            $_sm = [];
+            if (isset($schedule_members)) {
+                $_sm['schedule_members'] = $schedule_members;
+            }
+            if ($this->add_edit_schedule_members($_sm, $insert_id)) {
+                $affectedRows++;
+            }
+            
             hooks()->do_action('after_schedule_added', $insert_id);
 
             if ($save_and_send === true) {
                 $this->send_schedule_to_client($insert_id, '', true, '', true);
             }
+
 
             return $insert_id;
         }

@@ -124,6 +124,7 @@ $lang['not_staff_added_as_schedule_member']                = 'Staff added as sch
 $lang['schedule_send_to_customer_already_sent_2']                = 'Schedule send to customer already sent';
 $lang['schedules_tracking']                = 'Schedules tracking';
 $lang['schedule_activity_added_team_member']                = 'Added team member';
+$lang['schedule_already_send_to_client_tooltip']  = 'This schedule is already sent to the client %s';
 
 
 
@@ -144,7 +145,6 @@ $lang['schedule_add_edit_currency']               = 'Currency';
 $lang['schedules_toggle_table_tooltip']           = 'Toggle Table';
 $lang['schedule_add_edit_advanced_options']       = 'Advanced Options';
 $lang['schedules_list_all']                       = 'All';
-$lang['schedule_already_send_to_client_tooltip']  = 'This schedule is already sent to the client %s';
 $lang['schedule_send_to_client_modal_heading']    = 'Send schedule to client';
 $lang['schedule_send_to_client_attach_pdf']       = 'Attach schedule PDF';
 $lang['schedule_send_to_client_preview_template'] = 'Preview Email Template';

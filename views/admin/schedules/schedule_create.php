@@ -13,7 +13,6 @@
 				<?php $this->load->view('admin/schedules/schedule_template'); ?>
 			</div>
 			<?php echo form_close(); ?>
-			<?php $this->load->view('admin/invoice_items/item'); ?>
 		</div>
 	</div>
 </div>
