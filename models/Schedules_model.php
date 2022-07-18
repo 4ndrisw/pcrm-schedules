@@ -1640,5 +1640,13 @@ class Schedules_model extends App_Model
 //        return $this->db->get(db_prefix() . 'schedules')->result_array();
     }
 
+    public function get_schedules_by_project_id($project_id){
+        $this->db->select(db_prefix() . 'schedules.id');
+        $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'left');
+        $this->db->where(db_prefix() . 'schedules.project_id', $project_id);
+        //return $this->db->get_compiled_select(db_prefix() . 'schedules');
+        return $this->db->get(db_prefix() . 'schedules')->result_array();
+    }
+
 
 }
