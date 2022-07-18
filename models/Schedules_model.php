@@ -1339,9 +1339,9 @@ class Schedules_model extends App_Model
                         $this->db->where('staff_id', $schedule_member['staff_id']);
                         $this->db->delete(db_prefix() . 'schedule_members');
                         if ($this->db->affected_rows() > 0) {
-                            $this->db->where('staff_id', $schedule_member['staff_id']);
-                            $this->db->where('schedule_id', $id);
-                            $this->db->delete(db_prefix() . 'pinned_schedules');
+                            //$this->db->where('staff_id', $schedule_member['staff_id']);
+                            //$this->db->where('schedule_id', $id);
+                            //$this->db->delete(db_prefix() . 'pinned_schedules');
 
                             $this->log_schedule_activity($id, 'schedule_activity_removed_team_member', get_staff_full_name($schedule_member['staff_id']));
                             $affectedRows++;
