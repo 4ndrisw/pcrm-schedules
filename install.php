@@ -11,6 +11,7 @@ if (!$CI->db->table_exists(db_prefix() . 'schedules')) {
       `clientid` int(11) NOT NULL DEFAULT 0,
       `deleted_customer_name` varchar(100) DEFAULT NULL,
       `project_id` int(11) NOT NULL DEFAULT 0,
+      `office_id` int(11) NOT NULL DEFAULT 0,
       `number` int(11) NOT NULL DEFAULT 0,
       `prefix` varchar(50) DEFAULT NULL,
       `number_format` int(11) NOT NULL DEFAULT 0,
@@ -61,6 +62,7 @@ if (!$CI->db->table_exists(db_prefix() . 'schedules')) {
       ADD KEY `status` (`status`),
       ADD KEY `clientid` (`clientid`),
       ADD KEY `project_id` (`project_id`),
+      ADD KEY `office_id` (`office_id`),
       ADD KEY `date` (`date`);');
 
     $CI->db->query('ALTER TABLE `' . db_prefix() . 'schedules`

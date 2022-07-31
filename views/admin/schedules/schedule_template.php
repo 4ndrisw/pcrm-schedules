@@ -182,6 +182,19 @@
                   
                </div>
             </div>
+
+            <?php
+                $selected = NULL;
+                foreach($offices as $office){
+                 if(isset($schedule)){
+                   if($schedule->office_id == $office['id']) {
+                     $selected = $office['id'];
+                   }
+                 }
+                }
+                echo render_select('office_id',$offices,array('id',array('full_name')),'office_full_name',$selected);
+            ?>
+
             <div class="clearfix mbot15"></div>
             <?php $rel_id = (isset($schedule) ? $schedule->id : false); ?>
             <?php

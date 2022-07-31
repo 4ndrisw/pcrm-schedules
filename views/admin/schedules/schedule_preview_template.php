@@ -304,6 +304,12 @@
                            </p>
                            <?php } ?>
                         </div>
+                        <div class="col-md-12 offices">
+                           <p class="no-mbot">
+                              <span class="bold"><?php echo _l('office_full_name'); ?>:</span>
+                              <?php echo get_office_name_by_id($schedule->office_id); ?>
+                           </p> 
+                        </div>
                      </div>
                   </div>
                   <div class="row">

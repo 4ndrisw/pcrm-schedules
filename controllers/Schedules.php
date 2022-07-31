@@ -144,7 +144,7 @@ class Schedules extends AdminController
             $data['ajaxItems'] = true;
         }
         */
-
+        $data['offices']           = get_available_office();
         $data['staff']             = $this->staff_model->get('', ['active' => 1]);
         $data['schedule_statuses'] = $this->schedules_model->get_statuses();
         $data['title']             = $title;
@@ -213,7 +213,7 @@ class Schedules extends AdminController
         $data['schedule_members']  = $this->schedules_model->get_schedule_members($id);
         //$data['schedule_items']    = $this->schedules_model->get_schedule_item($id);
 
-
+        $data['offices']           = get_available_office();
         $data['staff']             = $this->staff_model->get('', ['active' => 1]);
         $data['schedule_statuses'] = $this->schedules_model->get_statuses();
         $data['title']             = $title;
@@ -414,6 +414,20 @@ class Schedules extends AdminController
         }
 
         redirect(admin_url('schedules/schedule/' . $id));
+    }
+
+
+    /* Used in kanban when dragging and mark as */
+    public function schedules_by_project_id($project_id)
+    {
+//      if ($this->input->is_ajax_request()) {
+            $schedules = $this->schedules_model->get_schedules_by_project_id($project_id);
+            $output = [];
+            foreach($schedules as $schedule){
+                $output[$schedule['id']] = format_schedule_number($schedule['id']);
+            }
+            return $output;
+//      }
     }
 
 }

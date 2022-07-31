@@ -737,3 +737,17 @@ function after_schedule_updated($id){
 
 
 }
+
+
+
+/**
+ * Check if customer has project assigned
+ * @param  mixed $customer_id customer id to check
+ * @return boolean
+ */
+function project_has_schedules($project_id)
+{
+    $totalProjectsScheduled = total_rows(db_prefix() . 'schedules', 'project_id=' . get_instance()->db->escape_str($project_id));
+
+    return ($totalProjectsScheduled > 0 ? true : false);
+}
