@@ -117,23 +117,3 @@ $client_info .= '</div>';
 $left_info  = $swap == '1' ? $client_info : $assigned_info;
 $right_info = $swap == '1' ? $assigned_info : $client_info;
 pdf_multi_row($left_info, $right_info, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
-
-
-
-if (!empty($schedule->clientnote)) {
-    $pdf->Ln(4);
-    $pdf->SetFont($font_name, 'B', $font_size);
-    $pdf->Cell(0, 0, _l('schedule_order'), 0, 1, 'L', 0, '', 0);
-    $pdf->SetFont($font_name, '', $font_size);
-    $pdf->Ln(2);
-    $pdf->writeHTMLCell('', '', '', '', $schedule->clientnote, 0, 1, false, true, 'L', true);
-}
-
-if (!empty($schedule->terms)) {
-    $pdf->Ln(4);
-    $pdf->SetFont($font_name, 'B', $font_size);
-    $pdf->Cell(0, 0, _l('terms_and_conditions') . ":", 0, 1, 'L', 0, '', 0);
-    $pdf->SetFont($font_name, '', $font_size);
-    $pdf->Ln(2);
-    $pdf->writeHTMLCell('', '', '', '', $schedule->terms, 0, 1, false, true, 'L', true);
-}
