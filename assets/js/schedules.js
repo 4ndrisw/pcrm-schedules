@@ -19,6 +19,7 @@ function validate_schedule_form(selector) {
             }
         },
         date: 'required',
+        office_id: 'required',
         number: {
             required: true
         }
