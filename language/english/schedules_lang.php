@@ -137,6 +137,7 @@ $lang['view_office_pdf_in_new_window'] = 'View office pdf in new tab';
 $lang['schedule_office_to'] = 'Dear honorable';
 $lang['schedule_office_pdf_heading'] = 'LETTER OF NOTIFICATION';
 
+$lang['schedule_crm_info'] = '- This document is issued through the CRM Application, does not require a wet signature from %s.';
 
 
 /*

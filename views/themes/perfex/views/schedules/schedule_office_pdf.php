@@ -117,3 +117,7 @@ $client_info .= '</div>';
 $left_info  = $swap == '1' ? $client_info : $assigned_info;
 $right_info = $swap == '1' ? $assigned_info : $client_info;
 pdf_multi_row($left_info, $right_info, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
+
+$pdf->ln(2);   
+$companyname = get_option('companyname');
+$pdf->writeHTMLCell('', '', '', '', _l('schedule_crm_info', $companyname), 0, 1, false, true, 'L', true);

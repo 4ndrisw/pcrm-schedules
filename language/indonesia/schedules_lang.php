@@ -133,6 +133,7 @@ $lang['view_office_pdf_in_new_window'] = 'View office pdf in new tab';
 $lang['schedule_office_to'] = 'Kepada Yth: ';
 $lang['schedule_office_pdf_heading'] = 'Surat Pemberitahuan';
 
+$lang['schedule_crm_info'] = '- Dokumen ini diterbitkan melalui Aplikasi CRM, tidak memerlukan tanda tangan basah dari %s.';
 
 
 /*
