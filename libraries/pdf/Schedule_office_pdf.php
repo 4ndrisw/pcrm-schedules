@@ -23,7 +23,7 @@ class Schedule_office_pdf extends App_pdf
         $this->schedule        = $schedule;
         $this->schedule_number = format_schedule_number($this->schedule->id);
 
-        $this->SetTitle($this->schedule_number);
+        $this->SetTitle(str_replace("SCH", "SCH-UPT", $this->schedule_number));
     }
 
     public function prepare()
@@ -31,7 +31,7 @@ class Schedule_office_pdf extends App_pdf
 
         $this->set_view_vars([
             'status'          => $this->schedule->status,
-            'schedule_number' => $this->schedule_number,
+            'schedule_number' => str_replace("SCH", "SCH-UPT", $this->schedule_number),
             'schedule'        => $this->schedule,
         ]);
 

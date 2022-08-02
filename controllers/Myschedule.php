@@ -380,7 +380,7 @@ class Myschedule extends ClientsController
         }
 
         $fileNameHookData = hooks()->apply_filters('schedule_file_name_admin_area', [
-                            'file_name' => mb_strtoupper(slug_it($schedule_number)) . '.pdf',
+                            'file_name' => str_replace("SCH", "SCH-UPT", mb_strtoupper(slug_it($schedule_number)) . '.pdf'),
                             'schedule'  => $schedule,
                         ]);
 
