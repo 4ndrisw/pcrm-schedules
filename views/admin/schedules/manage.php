@@ -21,7 +21,7 @@
                         //_l('schedule_projects_name'),
                         _l('schedule_status'),
                         _l('schedule_start_date'),
-                        //_l('schedule_acceptance_name'),
+                        _l('office'),
                         _l('schedule_acceptance_date'),
                         //_l('schedule_end_date'),
                         ),'schedules'); ?>

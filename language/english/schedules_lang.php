@@ -129,6 +129,13 @@ $lang['schedule_already_send_to_client_tooltip']  = 'This schedule is already se
 $lang['no_project_not_scheduled']                = 'There is no project not scheduled';
 $lang['no_schedule_this_week'] = 'No schedule this week';
 
+$lang['schedule_opening'] = 'Yours faithfully';
+$lang['schedule_client']                = 'Through this letter, we inform you that the inspection will be carried out upon request from ';
+$lang['view_office_pdf'] = 'View office pdf';
+$lang['view_office_pdf_in_new_window'] = 'View office pdf in new tab';
+
+$lang['schedule_office_to'] = 'Dear honorable';
+$lang['schedule_office_pdf_heading'] = 'LETTER OF NOTIFICATION';
 
 
 

@@ -75,6 +75,9 @@ class Schedules_model extends App_Model
                     $schedule->client          = new stdClass();
                     $schedule->client->company = $schedule->deleted_customer_name;
                 }
+                include_once(FCPATH . 'modules/offices/models/Offices_model.php');
+                $this->load->model('offices_model');
+                $schedule->office = $this->offices_model->get($schedule->office_id);
 
                 $this->load->model('email_schedule_model');
                 $schedule->scheduled_email = $this->email_schedule_model->get($id, 'schedule');

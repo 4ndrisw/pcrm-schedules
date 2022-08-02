@@ -455,6 +455,19 @@ function schedule_pdf($schedule, $tag = '')
 }
 
 
+/**
+ * Prepare general schedule pdf
+ * @since  Version 1.0.2
+ * @param  object $schedule schedule as object with all necessary fields
+ * @param  string $tag tag for bulk pdf exporter
+ * @return mixed object
+ */
+function schedule_office_pdf($schedule, $tag = '')
+{
+    return app_pdf('schedule',  module_libs_path(SCHEDULES_MODULE_NAME) . 'pdf/Schedule_office_pdf', $schedule, $tag);
+}
+
+
 
 /**
  * Get items table for preview

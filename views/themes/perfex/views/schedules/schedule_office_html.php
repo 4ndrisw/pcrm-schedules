@@ -24,47 +24,14 @@
                      <?php echo format_schedule_status($schedule->status,'',true); ?>
                   </h4>
                </div>
-               <div class="col-md-9">         
-                  <?php
-                     // Is not accepted, declined and expired
-                     if ($schedule->status != 4 && $schedule->status != 3 && $schedule->status != 5) {
-                       $can_be_accepted = true;
-                       if($identity_confirmation_enabled == '0'){
-                         echo form_open($this->uri->uri_string(), array('class'=>'pull-right mtop7 action-button'));
-                         echo form_hidden('schedule_action', 4);
-                         echo '<button type="submit" data-loading-text="'._l('wait_text').'" autocomplete="off" class="btn btn-success action-button accept"><i class="fa fa-check"></i> '._l('clients_accept_schedule').'</button>';
-                         echo form_close();
-                       } else {
-                         echo '<button type="button" id="accept_action" class="btn btn-success mright5 mtop7 pull-right action-button accept"><i class="fa fa-check"></i> '._l('clients_accept_schedule').'</button>';
-                       }
-                     } else if($schedule->status == 3){
-                       if (($schedule->expirydate >= date('Y-m-d') || !$schedule->expirydate) && $schedule->status != 5) {
-                         $can_be_accepted = true;
-                         if($identity_confirmation_enabled == '0'){
-                           echo form_open($this->uri->uri_string(),array('class'=>'pull-right mtop7 action-button'));
-                           echo form_hidden('schedule_action', 4);
-                           echo '<button type="submit" data-loading-text="'._l('wait_text').'" autocomplete="off" class="btn btn-success action-button accept"><i class="fa fa-check"></i> '._l('clients_accept_schedule').'</button>';
-                           echo form_close();
-                         } else {
-                           echo '<button type="button" id="accept_action" class="btn btn-success mright5 mtop7 pull-right action-button accept"><i class="fa fa-check"></i> '._l('clients_accept_schedule').'</button>';
-                         }
-                       }
-                     }
-                     // Is not accepted, declined and expired
-                     if ($schedule->status != 4 && $schedule->status != 3 && $schedule->status != 5) {
-                       echo form_open($this->uri->uri_string(), array('class'=>'pull-right action-button mright5 mtop7'));
-                       echo form_hidden('schedule_action', 3);
-                       echo '<button type="submit" data-loading-text="'._l('wait_text').'" autocomplete="off" class="btn btn-default action-button accept"><i class="fa fa-remove"></i> '._l('clients_decline_schedule').'</button>';
-                       echo form_close();
-                     }
-                     ?>
-                  <?php echo form_open(site_url('schedules/pdf/'.$schedule->id), array('class'=>'pull-right action-button')); ?>
+               <div class="col-md-9">
+                  <?php echo form_open(site_url('schedules/office_pdf/'.$schedule->id), array('class'=>'pull-right action-button')); ?>
                   <button type="submit" name="schedulepdf" class="btn btn-default action-button download mright5 mtop7" value="schedulepdf">
                   <i class="fa fa-file-pdf-o"></i>
                   <?php echo _l('clients_invoice_html_btn_download'); ?>
                   </button>
                   <?php echo form_close(); ?>
-                  <?php if((is_client_logged_in() && has_contact_permission('schedules'))  || is_staff_member()){ ?>
+                  <?php if(is_client_logged_in() || is_staff_member()){ ?>
                   <a href="<?php echo site_url('clients/schedules/'); ?>" class="btn btn-default pull-right mright5 mtop7 action-button go-to-portal">
                   <?php echo _l('client_go_to_dashboard'); ?>
                   </a>
@@ -88,7 +55,24 @@
                </address>
             </div>
             <div class="col-sm-6 text-right transaction-html-info-col-right">
-               <span class="bold schedule_to"><?php echo _l('schedule_to'); ?>:</span>
+               <span class="bold schedule_to"><?php echo _l('schedule_office_to'); ?>:</span>
+               <address class="schedule-html-customer-billing-info">
+                  <?php echo format_office_info($schedule->office, 'office', 'billing'); ?>
+               </address>
+               <!-- shipping details -->
+               <?php if($schedule->include_shipping == 1 && $schedule->show_shipping_on_schedule == 1){ ?>
+               <span class="bold schedule_ship_to"><?php echo _l('ship_to'); ?>:</span>
+               <address class="schedule-html-customer-shipping-info">
+                  <?php echo format_office_info($schedule->office, 'office', 'shipping'); ?>
+               </address>
+               <?php } ?>
+            </div>
+         </div>
+         <div class="row">
+
+            <div class="col-sm-12 text-left transaction-html-info-col-left">
+               <p class="schedule_to"><?php echo _l('schedule_opening'); ?>:</p>
+               <span class="schedule_to"><?php echo _l('schedule_client'); ?>:</span>
                <address class="schedule-html-customer-billing-info">
                   <?php echo format_customer_info($schedule, 'schedule', 'billing'); ?>
                </address>
@@ -100,8 +84,9 @@
                </address>
                <?php } ?>
             </div>
-         </div>
-         <div class="row">
+
+
+
             <div class="col-md-6">
                <div class="container-fluid">
                   <?php if(!empty($schedule_members)){ ?>
@@ -200,32 +185,8 @@
                </div>
             </div>
 
-
-
-
-            <?php if(!empty($schedule->clientnote)){ ?>
-            <div class="col-md-12 schedule-html-note">
-            <hr />
-               <b><?php echo _l('schedule_order'); ?></b><br /><?php echo $schedule->clientnote; ?>
-            </div>
-            <?php } ?>
-            <?php if(!empty($schedule->terms)){ ?>
-            <div class="col-md-12 schedule-html-terms-and-conditions">
-               <b><?php echo _l('terms_and_conditions'); ?>:</b><br /><?php echo $schedule->terms; ?>
-            </div>
-            <?php } ?>
-
          </div>
       </div>
    </div>
 </div>
-<?php
-   if($identity_confirmation_enabled == '1' && $can_be_accepted){
-    get_template_part('identity_confirmation_form',array('formData'=>form_hidden('schedule_action',4)));
-   }
-   ?>
-<script>
-   $(function(){
-     new Sticky('[data-sticky]');
-   })
-</script>
+

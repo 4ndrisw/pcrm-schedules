@@ -96,6 +96,17 @@
                            <?php echo _l('print'); ?>
                            </a>
                         </li>
+
+                        <li class="hidden-xs"><a href="<?php echo site_url('schedules/office_pdf/'.$schedule->id.'?output_type=I'); ?>"><?php echo _l('view_office_pdf'); ?></a></li>
+                        <li class="hidden-xs"><a href="<?php echo site_url('schedules/office_pdf/'.$schedule->id.'?output_type=I'); ?>" target="_blank"><?php echo _l('view_office_pdf_in_new_window'); ?></a></li>
+                        <li><a href="<?php echo site_url('schedules/office_pdf/'.$schedule->id); ?>"><?php echo _l('download'); ?></a></li>
+                        <li>
+                           <a href="<?php echo site_url('schedules/office_pdf/'.$schedule->id.'?print=true'); ?>" target="_blank">
+                           <?php echo _l('print'); ?>
+                           </a>
+                        </li>
+
+                        
                      </ul>
                   </div>
                   <?php
@@ -235,10 +246,9 @@
                            _l('schedule_lowercase'),
                            _l('project_lowercase'),
                            '<a href="'.admin_url('projects/view/'.$schedule->project_id).'" target="_blank">' . $schedule->project_data->name . '</a>',
-                           )); ?></h4>
-                     </div>
-                     <?php } ?>
-                     <div class="col-md-6 col-sm-6">
+                           )); ?>
+                        </h4>
+
                         <h4 class="bold">
                            <?php
                               $tags = get_tags_in($schedule->id,'schedule');
@@ -251,7 +261,17 @@
                            <?php echo format_schedule_number($schedule->id); ?>
                            </span>
                            </a>
+                           <br />
+                           <a href="<?php echo site_url('schedules/office/'.$schedule->id.'/'.$schedule->hash); ?>">
+                           <span id="schedule-number">
+                           <?php echo str_replace("SCH", "SCH-UPT", format_schedule_number($schedule->id)) ; ?>
+                           </span>
+                           </a>
                         </h4>
+
+                     </div>
+                     <?php } ?>
+                     <div class="col-md-6 col-sm-6">
                         <address>
                            <?php echo format_organization_info(); ?>
                         </address>

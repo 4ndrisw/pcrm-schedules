@@ -15,7 +15,7 @@ $aColumns = [
     //db_prefix() . 'projects.name',
     'status',
     db_prefix() . 'schedules.date',
-    //'acceptance_firstname',
+    'office_id',
     db_prefix() . 'schedules.acceptance_date',
 ];
 
@@ -103,9 +103,10 @@ foreach ($rResult as $aRow) {
 
             $_data = $outputStatus;
 
-
         } elseif ($aColumns[$i] == 'date') {
             $_data = _d($_data);
+        } elseif ($aColumns[$i] == 'office_id') {
+            $_data = get_office_short_name_by_id($_data);
         } elseif ($aColumns[$i] == 'acceptance_firstname') {
             //$_data = $_data;
             $_data = $aRow['acceptance_firstname'] .' '. $aRow['acceptance_lastname'];

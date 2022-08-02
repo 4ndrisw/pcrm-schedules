@@ -125,6 +125,14 @@ $lang['no_project_not_scheduled']                = 'Tidak ada project yang belum
 $lang['not_staff_added_as_schedule_member']                = 'Staff ditambahkan sebagai schedule member';
 $lang['no_schedule_this_week']                = 'Tidak ada jadwal minggu ini';
 
+$lang['schedule_opening'] = 'Dengan Hormat';
+$lang['schedule_client']                = 'Melalui surat ini kami informasikan bahwa akan dilaksanakan riksa uji beradasarkan permintaan dari ';
+$lang['view_office_pdf'] = 'View office pdf';
+$lang['view_office_pdf_in_new_window'] = 'View office pdf in new tab';
+
+$lang['schedule_office_to'] = 'Kepada Yth: ';
+$lang['schedule_office_pdf_heading'] = 'Surat Pemberitahuan';
+
 
 
 /*
