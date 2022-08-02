@@ -123,8 +123,6 @@ if (!empty($schedule->terms)) {
     $pdf->SetFont($font_name, '', $font_size);
     $pdf->Ln(2);
     $pdf->writeHTMLCell('', '', '', '', $schedule->terms, 0, 1, false, true, 'L', true);
-}   
-$companyname = get_option('companyname');
-$pdf->writeHTMLCell('', '', '', '', _l('schedule_crm_info', $companyname), 0, 1, false, true, 'L', true);
+} 
 
 
