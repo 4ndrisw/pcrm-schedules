@@ -213,9 +213,10 @@ function schedules_settings_tab()
 
 $CI = &get_instance();
 $CI->load->helper(SCHEDULES_MODULE_NAME . '/schedules');
-
+/*
 if(($CI->uri->segment(0)=='admin' && $CI->uri->segment(1)=='schedules') || $CI->uri->segment(1)=='schedules'){
     $CI->app_css->add(SCHEDULES_MODULE_NAME.'-css', base_url('modules/'.SCHEDULES_MODULE_NAME.'/assets/css/'.SCHEDULES_MODULE_NAME.'.css'));
     $CI->app_scripts->add(SCHEDULES_MODULE_NAME.'-js', base_url('modules/'.SCHEDULES_MODULE_NAME.'/assets/js/'.SCHEDULES_MODULE_NAME.'.js'));
 }
+*/
 

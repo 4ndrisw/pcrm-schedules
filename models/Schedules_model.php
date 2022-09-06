@@ -21,7 +21,7 @@ class Schedules_model extends App_Model
             5,
             3,
             4,
-        ]);   
+        ]);
     }
     /**
      * Get unique sale agent for schedules / Used for filters
@@ -175,7 +175,7 @@ class Schedules_model extends App_Model
         $format = get_option('jobreport_number_format');
         $prefix = get_option('jobreport_prefix');
         $date = date('Y-m-d');
-        
+
         $new_jobreport_data['formatted_number'] = jobreport_number_format($number, $format, $prefix, $date);
 
 
@@ -275,7 +275,7 @@ class Schedules_model extends App_Model
         }
 
         $new_schedule_data['show_quantity_as'] = $_schedule->show_quantity_as;
-    
+
         $new_schedule_data['terms']            = $_schedule->terms;
         $new_schedule_data['assigned']       = $_schedule->assigned;
         $new_schedule_data['reference_no']     = $_schedule->reference_no;
@@ -349,7 +349,7 @@ class Schedules_model extends App_Model
 
         return false;
     }
-    
+
 
     /**
      * Performs schedules totals status
@@ -430,7 +430,7 @@ class Schedules_model extends App_Model
     public function add($data)
     {
         $affectedRows = 0;
-        
+
         $data['datecreated'] = date('Y-m-d H:i:s');
 
         $data['addedfrom'] = get_staff_user_id();
@@ -511,7 +511,7 @@ class Schedules_model extends App_Model
             if ($this->add_edit_schedule_members($_sm, $insert_id)) {
                 $affectedRows++;
             }
-            
+
             hooks()->do_action('after_schedule_added', $insert_id);
 
             if ($save_and_send === true) {
@@ -577,7 +577,7 @@ class Schedules_model extends App_Model
             $schedule_members = $data['schedule_members'];
             unset($data['schedule_members']);
         }
-        
+
         if (isset($data['tags'])) {
             if (handle_tags_save($data['tags'], $id, 'schedule')) {
                 $affectedRows++;
@@ -792,11 +792,11 @@ class Schedules_model extends App_Model
                 if ($action == 2) {
                     $this->db->where('id', $id);
                     $this->db->update(db_prefix() . 'schedules', ['sent' => 1, 'datesend' => date('Y-m-d H:i:s')]);
-                
+
                     $this->db->where('active', 1);
                     $staff_schedule = $this->db->get(db_prefix() . 'staff')->result_array();
                     $contacts = $this->clients_model->get_contacts($schedule->clientid, ['active' => 1, 'project_emails' => 1]);
-                    
+
                         foreach ($staff_schedule as $member) {
                             $notified = add_notification([
                                 'fromcompany'     => true,
@@ -807,7 +807,7 @@ class Schedules_model extends App_Model
                                     format_schedule_number($schedule->id),
                                 ]),
                             ]);
-                    
+
                             if ($notified) {
                                 array_push($notifiedUsers, $member['staffid']);
                             }
@@ -974,7 +974,7 @@ class Schedules_model extends App_Model
 
             $this->db->where('rel_id', $id);
             $this->db->where('rel_type', 'schedule');
-            $this->db->delete('schedule_emails');
+            $this->db->delete('scheduled_emails');
 
             // Get related tasks
             $this->db->where('rel_type', 'schedule');
@@ -1438,7 +1438,7 @@ class Schedules_model extends App_Model
 
                 try {
                     // init bootstrapping phase
-                 
+
                     //$send = // (To fix merge field) send_mail_template('schedule_staff_added_as_member', $data, $id, $client_id);
                     $this->log_schedule_activity($id, 'schedule_activity_added_team_member', get_staff_full_name($staff_id));
                     $this->log_schedule_activity($id, 'schedule_activity_added_team_member', $client_id);
@@ -1447,7 +1447,7 @@ class Schedules_model extends App_Model
                     {
                       throw new Exception("Mail not send.");
                     }
-                  
+
                     // continue execution of the bootstrapping phase
                 } catch (Exception $e) {
                     echo $e->getMessage();
@@ -1578,7 +1578,7 @@ class Schedules_model extends App_Model
         $this->db->select(db_prefix() . 'schedules.id,' . db_prefix() . 'schedules.number,' . db_prefix() . 'clients.userid,' . db_prefix() . 'clients.company,' . db_prefix() . 'projects.id,' . db_prefix() . 'projects.name,' . db_prefix() . 'projects.start_date');
         $this->db->join(db_prefix() . 'projects', db_prefix() . 'projects.id = ' . db_prefix() . 'schedules.project_id', 'right');
         $this->db->join(db_prefix() . 'clients', db_prefix() . 'clients.userid = ' . db_prefix() . 'projects.clientid', 'left');
-        
+
         $this->db->where('project_id IS NULL');
         $this->db->where(db_prefix() . 'projects.start_date >=', $diff1);
         $this->db->where(db_prefix() . 'projects.start_date <=', $diff2);
