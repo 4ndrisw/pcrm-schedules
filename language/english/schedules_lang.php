@@ -138,6 +138,16 @@ $lang['schedule_office_to'] = 'Dear honorable';
 $lang['schedule_office_pdf_heading'] = 'LETTER OF NOTIFICATION';
 
 $lang['schedule_crm_info'] = '- This document is issued through the CRM Application, does not require a wet signature from %s.';
+$lang['schedule_activity_converted']                              = 'converted this schedule to invoice.<br /> %s';
+$lang['schedule_activity_created']                                = 'Created the schedule';
+$lang['schedule_activity_removed_item']                   = 'removed item <b>%s</b>';
+$lang['schedule_activity_number_changed']                         = 'Schedule number changed from %s to %s';
+$lang['schedule_activity_updated_item_short_description'] = 'updated item short description from %s to %s';
+$lang['schedule_activity_updated_item_long_description']  = 'updated item long description from <b>%s</b> to <b>%s</b>';
+$lang['schedule_activity_updated_item_rate']              = 'updated item rate from %s to %s';
+$lang['schedule_activity_updated_qty_item']               = 'updated quantity on item <b>%s</b> from %s to %s';
+$lang['schedule_activity_added_item']                     = 'added new item <b>%s</b>';
+$lang['schedule_activity_sent_to_client']                 = 'sent schedule to client';
 
 
 /*
@@ -205,16 +215,6 @@ $lang['not_schedule_status_change']                               = 'Imported at
 $lang['not_schedule_status_updated']                              = 'Schedule Status Updated: From: %s to %s';
 $lang['not_schedule_customer_accepted']                           = 'Congratulations! Client accepted schedule with number %s';
 $lang['not_schedule_customer_declined']                           = 'Client declined schedule with number %s';
-$lang['schedule_activity_converted']                              = 'converted this schedule to invoice.<br /> %s';
-$lang['schedule_activity_created']                                = 'Created the schedule';
-$lang['schedule_activity_removed_item']                   = 'removed item <b>%s</b>';
-$lang['schedule_activity_number_changed']                         = 'Schedule number changed from %s to %s';
-$lang['schedule_activity_updated_item_short_description'] = 'updated item short description from %s to %s';
-$lang['schedule_activity_updated_item_long_description']  = 'updated item long description from <b>%s</b> to <b>%s</b>';
-$lang['schedule_activity_updated_item_rate']              = 'updated item rate from %s to %s';
-$lang['schedule_activity_updated_qty_item']               = 'updated quantity on item <b>%s</b> from %s to %s';
-$lang['schedule_activity_added_item']                     = 'added new item <b>%s</b>';
-$lang['schedule_activity_sent_to_client']                 = 'sent schedule to client';
 $lang['settings_amount_to_words_desc']     = 'Output total amount to words in invoice/schedule';
 $lang['home_schedule_overview']       = 'Schedule overview';
 $lang['zip_schedules']        = 'Zip Schedules';
