@@ -1538,6 +1538,12 @@ class Schedules_model extends App_Model
      */
     public function get_schedules_this_week($staffId = null, $days = 7)
     {
+        $schedule_number_of_date = get_option('schedule_number_of_date');
+        
+        if($schedule_number_of_date > 0){
+            $days = $schedule_number_of_date;
+        }
+        
         $diff1 = date('Y-m-d', strtotime('-' . 0 . ' days'));
         $diff2 = date('Y-m-d', strtotime('+' . $days . ' days'));
 

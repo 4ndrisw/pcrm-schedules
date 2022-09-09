@@ -16,6 +16,9 @@
       <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('due_after_help'); ?>"></i>
       <?php echo render_input('settings[schedule_due_after]','schedule_due_after',get_option('schedule_due_after')); ?>
       <hr />
+      <i class="fa fa-question-circle pull-left" data-toggle="tooltip" data-title="<?php echo _l('schedule_number_of_date_tooltip'); ?>"></i>
+      <?php echo render_input('settings[schedule_number_of_date]','schedule_number_of_date',get_option('schedule_number_of_date'), 'number', ['min'=>0]); ?>
+      <hr />
       <?php render_yes_no_option('schedule_send_telegram_message','schedule_send_telegram_message'); ?>
       <hr />
       <?php render_yes_no_option('delete_only_on_last_schedule','delete_only_on_last_schedule'); ?>
