@@ -326,7 +326,14 @@ class Schedules_model extends App_Model
             }
             $key++;
         }
-
+        
+        $schedule_members = $this->get_schedule_members($id);
+        $members = [];
+        foreach($schedule_members as $key => $member){
+            $members[] = $member['staff_id'];
+        }
+        $new_schedule_data['schedule_members'] = $members;
+        
         $id = $this->add($new_schedule_data);
         if ($id) {
             $custom_fields = get_custom_fields('schedule');
