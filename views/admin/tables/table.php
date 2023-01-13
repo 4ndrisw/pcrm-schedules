@@ -43,7 +43,7 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $ad
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
-json_encode($rResult);
+//json_encode($rResult);
 
 foreach ($rResult as $aRow) {
     $row = [];
