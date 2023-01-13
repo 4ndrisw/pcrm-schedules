@@ -265,7 +265,9 @@ class Schedules_model extends App_Model
         $_schedule                       = $this->get($id);
         $new_schedule_data               = [];
         $new_schedule_data['clientid']   = $_schedule->clientid;
-        $new_schedule_data['schedule_id'] = $_schedule->schedule_id;
+        $new_schedule_data['schedule_id'] = $_schedule->id;
+        $new_schedule_data['project_id'] = $_schedule->project_id;
+        $new_schedule_data['office_id'] = $_schedule->office_id;
         $new_schedule_data['number']     = get_option('next_schedule_number');
         $new_schedule_data['date']       = _d(date('Y-m-d'));
         $new_schedule_data['expirydate'] = null;
@@ -306,11 +308,13 @@ class Schedules_model extends App_Model
             $new_schedule_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
             $new_schedule_data['newitems'][$key]['qty']              = $item['qty'];
             $new_schedule_data['newitems'][$key]['unit']             = $item['unit'];
+            /*
             $taxes                                                   = get_schedule_item_taxes($item['id']);
             foreach ($taxes as $tax) {
                 // tax name is in format TAX1|10.00
                 array_push($new_schedule_data['newitems'][$key]['taxname'], $tax['taxname']);
             }
+            */
             $new_schedule_data['newitems'][$key]['rate']  = $item['rate'];
             $new_schedule_data['newitems'][$key]['order'] = $item['item_order'];
             foreach ($custom_fields_items as $cf) {
@@ -322,6 +326,7 @@ class Schedules_model extends App_Model
             }
             $key++;
         }
+
         $id = $this->add($new_schedule_data);
         if ($id) {
             $custom_fields = get_custom_fields('schedule');
@@ -342,7 +347,7 @@ class Schedules_model extends App_Model
             $tags = get_tags_in($_schedule->id, 'schedule');
             handle_tags_save($tags, $id, 'schedule');
 
-            log_schedule_activity('Copied Schedule ' . format_schedule_number($_schedule->id));
+            $this->log_schedule_activity('Copied Schedule ' . format_schedule_number($_schedule->id));
 
             return $id;
         }
